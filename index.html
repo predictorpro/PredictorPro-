@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar-DZ" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -324,9 +324,9 @@
         });
       });
 
-      // Инициализация языка
+      // Инициализация языка — по умолчанию английский
       (function initLang(){
-        let code = 'ar';
+        let code = 'en';
         try {
           const saved = localStorage.getItem('preferredLang');
           if (saved && I18N[saved]) code = saved;
