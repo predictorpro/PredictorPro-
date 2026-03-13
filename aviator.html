@@ -1,488 +1,2678 @@
 <!DOCTYPE html>
 <html lang="es-PE" class="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/> <!-- ✅ для мобильной адаптации -->
-  <title>PredictorPro – Aviador</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title id="docTitle">PredictorPro – Aviador</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Activar tema oscuro por clase
     tailwind.config = { darkMode: 'class' };
   </script>
+
   <style>
-    /* Переносим фон с body на фиксированный слой, чтобы он не «ездил» на мобилках */
-    body.diamond-bg{
-      background: none !important; /* отключаем прежний фон у body */
-      position: relative;          /* базовый контекст для псевдо-элемента */
-    }
-    /* Фон (светлая тема) — фиксированный слой позади контента */
+    /* ===== Фон страницы (паттерн), поверх — liquid glass (как Apple of Fortune) ===== */
+    body.diamond-bg{ background: none !important; position: relative; }
     body.diamond-bg::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
+      content:""; position: fixed; inset:0; z-index:-1; pointer-events:none;
       background-color:#fff;
       background-image:
         linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 65%),
-        repeating-linear-gradient(45deg, rgba(22,163,74,.15) 0 12px, rgba(22,163,74,0) 12px 24px),
-        repeating-linear-gradient(-45deg, rgba(22,163,74,.15) 0 12px, rgba(22,163,74,0) 12px 24px),
+        repeating-linear-gradient(45deg, rgba(22,163,74,.12) 0 12px, rgba(22,163,74,0) 12px 24px),
+        repeating-linear-gradient(-45deg, rgba(22,163,74,.12) 0 12px, rgba(22,163,74,0) 12px 24px),
         linear-gradient(to bottom, #ecfdf5, #d1fae5);
-      background-size: auto, 40px 40px, 40px 40px, auto;
+      background-size:auto,40px 40px,40px 40px,auto;
       background-position: top left, center, center, center;
     }
-    /* Фон (тёмная тема) — тот же слой, но с тёмными градиентами */
     .dark body.diamond-bg::before{
       background-color:#000;
       background-image:
         linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0) 65%),
-        repeating-linear-gradient(45deg, rgba(22,163,74,.25) 0 12px, rgba(22,163,74,0) 12px 24px),
-        repeating-linear-gradient(-45deg, rgba(22,163,74,.25) 0 12px, rgba(22,163,74,0) 12px 24px),
+        repeating-linear-gradient(45deg, rgba(22,163,74,.2) 0 12px, rgba(22,163,74,0) 12px 24px),
+        repeating-linear-gradient(-45deg, rgba(22,163,74,.2) 0 12px, rgba(22,163,74,0) 12px 24px),
         linear-gradient(to bottom, #052e16, #065f46);
-      background-size: auto, 40px 40px, 40px 40px, auto;
+      background-size:auto,40px 40px,40px 40px,auto;
       background-position: top left, center, center, center;
+    }
+
+    /* ======= Apple Liquid Glass — базовые утилиты ======= */
+    .lgx-blur{ backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .lgx-sheen{ position:relative; overflow:hidden; }
+    .lgx-sheen::before{
+      content:""; position:absolute; left:-30%; top:-40%; width:160%; height:160%;
+      background: radial-gradient(140px 180px at 25% 30%, rgba(255,255,255,.35), transparent 60%);
+      filter: blur(12px); pointer-events: none; mix-blend-mode: screen;
+    }
+    @media (max-width: 640px){
+      .lgx-sheen::before{
+        left:-35%; top:-45%; width:170%; height:170%;
+        background: radial-gradient(120px 150px at 28% 28%, rgba(255,255,255,.32), transparent 62%);
+      }
+    }
+    .lgx-card{
+      border-radius: 1rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.08));
+      border: 1px solid rgba(34,197,94,.45);
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(255,255,255,.12);
+    }
+    .dark .lgx-card{
+      background: linear-gradient(135deg, rgba(0,0,0,.38), rgba(0,0,0,.2));
+      border-color: rgba(34,197,94,.55);
+    }
+    .lgx-chip{
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,255,255,.08));
+      border: 1px solid rgba(34,197,94,.5);
+      box-shadow:
+        0 8px 24px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.25),
+        inset 0 -1px 0 rgba(255,255,255,.12);
+    }
+    .dark .lgx-chip{
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
+      border-color: rgba(34,197,94,.55);
+    }
+
+    .lgx-btn{
+      border-radius: 1rem; font-weight: 600;
+      background: linear-gradient(135deg, rgba(34,197,94,.28), rgba(34,197,94,.12));
+      border: 1px solid rgba(34,197,94,.55);
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.25),
+        inset 0 -1px 0 rgba(255,255,255,.12);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      touch-action: manipulation;
+      transform: translate3d(0,0,0);
+    }
+    .lgx-btn:hover{ transform: translate3d(0,-1px,0); border-color: rgba(34,197,94,.7); }
+    .lgx-btn:active{ transform: translate3d(0,0,0); }
+    .lgx-btn.solid{ background: linear-gradient(135deg, rgba(16,185,129,.40), rgba(16,185,129,.18)); }
+
+    .lgx-nav{
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      border-bottom: 1px solid rgba(34,197,94,.4);
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+    }
+    .dark .lgx-nav{
+      background: linear-gradient(135deg, rgba(0,0,0,.5), rgba(0,0,0,.28));
+      border-color: rgba(34,197,94,.5);
+    }
+
+    .nav-badge{
+      border-radius: 9999px;
+      padding: .45rem .65rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      border: 1px solid rgba(34,197,94,.40);
+      box-shadow:
+        0 8px 22px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.22);
+      transition: transform .18s ease;
+      transform: translate3d(0,0,0);
+    }
+    .dark .nav-badge{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.24));
+      border-color: rgba(34,197,94,.5);
+    }
+    .nav-badge:hover{ transform: translate3d(0,-1px,0); }
+
+    .online-pill{
+      border: 0 !important;
+      padding: .30rem .55rem !important;
+      gap: .45rem !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,.10)) !important;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(255,255,255,.10) !important;
+      position: relative;
+      overflow: hidden;
+      height: 2.25rem;
+      display: inline-flex;
+      align-items: center;
+      width: auto;
+    }
+    .online-pill::before{
+      content:""; position:absolute; left:-35%; top:-55%; width:170%; height:170%;
+      background: radial-gradient(140px 180px at 28% 28%, rgba(255,255,255,.30), transparent 62%);
+      filter: blur(12px);
+      pointer-events:none;
+      mix-blend-mode: screen;
+      opacity: .9;
+    }
+    .dark .online-pill{
+      background: linear-gradient(135deg, rgba(0,0,0,.48), rgba(0,0,0,.28)) !important;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.12),
+        inset 0 -1px 0 rgba(255,255,255,.06) !important;
+    }
+    .dark .online-pill::before{ opacity: .55; }
+
+    .online-dot{
+      position: relative; width: .75rem; height: .75rem; border-radius: 9999px;
+      background: radial-gradient(circle at 40% 40%, #22c55e, #16a34a);
+      box-shadow: 0 0 10px rgba(34,197,94,.7);
+      flex: 0 0 auto;
+    }
+    .online-dot::after{
+      content:""; position:absolute; inset: -6px;
+      border-radius: 9999px; border: 2px solid rgba(34,197,94,.45);
+      animation: online-pulse 1.6s infinite ease-out;
+    }
+    @keyframes online-pulse{
+      0%{ transform: scale(.6); opacity:.8; }
+      70%{ transform: scale(1.25); opacity:0; }
+      100%{ transform: scale(1.25); opacity:0; }
+    }
+
+    .online-signal{
+      --cx: 50%;
+      --cy: 50%;
+      position: relative;
+      width: 1.65rem;
+      height: 1.65rem;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+    .online-signal .wave{
+      position:absolute;
+      left: var(--cx);
+      top: var(--cy);
+      width: .28rem;
+      height: .28rem;
+      border-radius: 9999px;
+      border: 2px solid rgba(34,197,94,.40);
+      transform: translate(-50%,-50%) scale(.25);
+      opacity: 0;
+      animation: wave-out 1.6s infinite ease-out;
+      pointer-events: none;
+    }
+    .online-signal .wave2{ animation-delay: .53s; opacity:0; }
+    .online-signal .wave3{ animation-delay: 1.06s; opacity:0; }
+    @keyframes wave-out{
+      0%{ transform: translate(-50%,-50%) scale(.35); opacity:.55; }
+      70%{ transform: translate(-50%,-50%) scale(4.2); opacity:0; }
+      100%{ transform: translate(-50%,-50%) scale(4.2); opacity:0; }
+    }
+    .online-signal .online-dot{
+      position: absolute;
+      left: var(--cx);
+      top: var(--cy);
+      transform: translate(-50%,-50%);
+      width: .52rem;
+      height: .52rem;
+      box-shadow: 0 0 12px rgba(34,197,94,.72);
+    }
+    .online-signal .online-dot::after{
+      inset: -7px;
+      border-color: rgba(34,197,94,.42);
+    }
+    #activeUsersCount{ line-height: 1; display: inline-flex; align-items: center; }
+
+    .online-tooltip{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      padding: .35rem .55rem;
+      border-radius: .75rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.10));
+      border: 1px solid rgba(34,197,94,.45);
+      box-shadow: 0 10px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12px;
+      font-weight: 600;
+      color: #166534;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
+      z-index: 60;
+    }
+    .dark .online-tooltip{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.28));
+      border-color: rgba(34,197,94,.55);
+      color: #4ade80;
+    }
+    .online-pill:hover .online-tooltip{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .glass-menu{
+      background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.10));
+      border: 1px solid rgba(34,197,94,.45);
+      box-shadow: 0 12px 26px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.18);
+      border-radius: .75rem;
+      overflow: hidden;
+    }
+    .dark .glass-menu{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.28));
+      border-color: rgba(34,197,94,.55);
+    }
+    .glass-menu button:hover{ background: rgba(255,255,255,.16); }
+    .dark .glass-menu button:hover{ background: rgba(255,255,255,.08); }
+
+    .lang-modal-backdrop{
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(0,0,0,.18);
+    }
+    .dark .lang-modal-backdrop{ background: rgba(0,0,0,.35); }
+
+    :root{
+      --pp-btn-font: ui-rounded, -apple-system, system-ui, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      --pp-header-h: 0px;
+    }
+    button, .nav-badge, #supportLabelTop, #langCaption, #historyTitle{
+      font-family: var(--pp-btn-font);
+    }
+
+    * { -webkit-tap-highlight-color: transparent; }
+    button::-moz-focus-inner{ border:0; }
+
+    #fetchBtn{
+      -webkit-appearance: none !important;
+      appearance: none !important;
+      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+      outline: none !important;
+      position: relative;
+      overflow: hidden;
+
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      background:
+        radial-gradient(180px 140px at 28% 24%, rgba(255,255,255,.18), transparent 62%),
+        linear-gradient(135deg, rgba(16,185,129,.40), rgba(16,185,129,.18)) !important;
+
+      will-change: transform;
+      touch-action: manipulation;
+    }
+    .dark #fetchBtn{
+      background:
+        radial-gradient(180px 140px at 28% 24%, rgba(255,255,255,.10), transparent 62%),
+        linear-gradient(135deg, rgba(16,185,129,.36), rgba(16,185,129,.16)) !important;
+    }
+    #fetchBtn:focus,
+    #fetchBtn:focus-visible,
+    #fetchBtn:active{ outline: none !important; }
+    #fetchBtn::before{ content:none !important; }
+    @media (max-width: 639px){
+      #fetchBtn{
+        transform: none !important;
+      }
+      #fetchBtn:hover{ transform: none !important; }
+      #fetchBtn:active{ transform: none !important; }
+    }
+    #fetchBtn:active{
+      transform: translate3d(0,1px,0) scale(.995) !important;
+      box-shadow:
+        0 8px 20px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(255,255,255,.10);
+    }
+    #fetchBtn[disabled]{ cursor: not-allowed; }
+    #fetchBtn[disabled]::after{
+      content:"";
+      position:absolute; inset:0;
+      border-radius: inherit;
+      background: rgba(0,0,0,.14);
+      pointer-events:none;
+    }
+
+    #langBtn, #faqButtonTop{ line-height: 0; }
+    #langCaption{ text-align:center; width:100%; pointer-events:none; }
+
+    .mobile-burger{
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .6rem;
+      gap: .28rem;
+      flex-direction: column;
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      border: 1px solid rgba(34,197,94,.40);
+      box-shadow: 0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .18s ease;
+      transform: translate3d(0,0,0);
+      touch-action: manipulation;
+    }
+    .dark .mobile-burger{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.24));
+      border-color: rgba(34,197,94,.5);
+    }
+    .mobile-burger:hover{ transform: translate3d(0,-1px,0); }
+
+    .mobile-burger .hm-line{
+      width: 1.3rem;
+      height: 2px;
+      border-radius: 9999px;
+      background: rgba(22,163,74,.95);
+      transition: transform .18s ease, opacity .18s ease, width .18s ease;
+      transform-origin: center;
+    }
+    .dark .mobile-burger .hm-line{ background: rgba(74,222,128,.95); }
+
+    .mobile-burger.open .hm-line:nth-child(1){ transform: translateY(.42rem) rotate(45deg); }
+    .mobile-burger.open .hm-line:nth-child(2){ opacity: 0; width: .2rem; }
+    .mobile-burger.open .hm-line:nth-child(3){ transform: translateY(-.42rem) rotate(-45deg); }
+
+    @media (max-width: 639px){
+      #mobileMenuWrap{ opacity: 0; pointer-events: none; transition: opacity .18s ease; }
+      #mobileMenuWrap.open{ opacity: 1; pointer-events: auto; }
+      #mobileMenuPanel{ transform: translateX(120%); transition: transform .22s ease; }
+      #mobileMenuWrap.open #mobileMenuPanel{ transform: translateX(0); }
+    }
+
+    .mobile-menu-item{
+      display:flex; align-items:center; gap:.75rem;
+      width:100%;
+      padding:.55rem .6rem;
+      border-radius: .85rem;
+      border: 1px solid rgba(34,197,94,.35);
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .dark .mobile-menu-item{
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
+      border-color: rgba(34,197,94,.45);
+    }
+    .mobile-menu-item:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.6); }
+    .mobile-menu-label{
+      font-weight: 700;
+      font-size: 13px;
+      color: #166534;
+      white-space: nowrap;
+    }
+    .dark .mobile-menu-label{ color: #4ade80; }
+
+    @media (max-width: 639px){
+      header .max-w-\[74rem\]{ padding-top: .65rem !important; padding-bottom: .65rem !important; }
+    }
+
+    #langMenu{
+      position: fixed !important;
+      z-index: 2147483647 !important;
+      top: 0;
+      left: 0;
+    }
+    header{ z-index: 9990 !important; }
+
+    /* ====== ПОЛЕ ПРОГНОЗА = квадрат + график на всё поле ====== */
+    #forecastWindow{
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  isolation: isolate;
+
+  /* анти-артефакт клиппинг для mobile */
+  border-radius: 1rem;
+  clip-path: inset(0 round 1rem);
+  -webkit-clip-path: inset(0 round 1rem);
+  contain: paint;
+}
+    #chartCanvas{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    #forecastWindow::after{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,.00) 0px,
+        rgba(0,0,0,.00) 2px,
+        rgba(0,0,0,.10) 3px
+      );
+      mix-blend-mode: overlay;
+      opacity: .45;
+      z-index: 2;
+    }
+    .dark #forecastWindow::after{ opacity: .55; }
+
+    #chartRightGlow{
+      position:absolute; top:0; right:0; bottom:0; width: 14%;
+      background: linear-gradient(to left, rgba(34,197,94,.22), rgba(34,197,94,0));
+      opacity: .65;
+      pointer-events:none;
+      z-index: 1;
+      transition: transform .25s ease, opacity .25s ease;
+      transform: translate3d(0,0,0);
+    }
+    .dark #chartRightGlow{
+      background: linear-gradient(to left, rgba(34,197,94,.18), rgba(34,197,94,0));
+      opacity: .55;
+    }
+
+    #forecastOverlay{
+      position:absolute; inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      z-index: 3;
+      padding: .9rem;
+    }
+
+    #chartCanvas,
+#chartRightGlow,
+#forecastOverlay{
+  border-radius: inherit;
+}
+
+    .a-overlay-card{
+      min-width: 70%;
+      max-width: 92%;
+      padding: .9rem 1rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(34,197,94,.55);
+      background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 14px 34px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.18);
+      position: relative;
+      overflow: hidden;
+    }
+    .dark .a-overlay-card{
+      background: linear-gradient(135deg, rgba(0,0,0,.42), rgba(0,0,0,.20));
+      border-color: rgba(34,197,94,.55);
+      box-shadow: 0 14px 34px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.10);
+    }
+
+    .a-scan{
+      position:absolute; inset:-30%;
+      background: linear-gradient(90deg,
+        rgba(34,197,94,0) 0%,
+        rgba(34,197,94,.10) 45%,
+        rgba(34,197,94,.28) 50%,
+        rgba(34,197,94,.10) 55%,
+        rgba(34,197,94,0) 100%
+      );
+      transform: translateX(-40%);
+      animation: a-scan-move 1.2s linear infinite;
+      opacity: .55;
+    }
+    .dark .a-scan{ opacity: .45; }
+    @keyframes a-scan-move{
+      0%{ transform: translateX(-45%) rotate(-8deg); }
+      100%{ transform: translateX(45%) rotate(-8deg); }
+    }
+
+    .a-dots{
+      display:inline-flex;
+      gap:.25rem;
+      margin-left: .25rem;
+      transform: translateY(1px);
+    }
+    .a-dots span{
+      width:.32rem; height:.32rem; border-radius:9999px;
+      background: rgba(34,197,94,.85);
+      opacity:.25;
+      animation: a-dot 1.1s infinite;
+    }
+    .a-dots span:nth-child(2){ animation-delay: .16s; }
+    .a-dots span:nth-child(3){ animation-delay: .32s; }
+    @keyframes a-dot{
+      0%, 80%, 100% { opacity:.25; transform: translateY(0); }
+      40% { opacity:1; transform: translateY(-2px); }
+    }
+
+    #analysisText{
+      font-weight: 800;
+      letter-spacing: .3px;
+      color: #0f172a;
+      text-align:left;
+      text-shadow: 0 10px 28px rgba(0,0,0,.22);
+    }
+    .dark #analysisText{
+      color: #eafff2;
+      text-shadow: 0 10px 28px rgba(0,0,0,.45);
+    }
+
+    #coefText{
+      font-weight: 900;
+      font-size: clamp(28px, 8.2vw, 56px);
+      line-height: 1;
+      text-align:center;
+      color: #eafff2;
+      text-shadow:
+        0 10px 34px rgba(0,0,0,.60),
+        0 0 18px rgba(34,197,94,.35);
+      letter-spacing: .6px;
+      white-space: nowrap;
+    }
+
+    /* =========================================================
+       ✅ VAR 1: Monte Carlo / Сходимость (массовые вычисления)
+       ========================================================= */
+    .mc-title-row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: .75rem;
+      margin-bottom: .25rem;
+    }
+    #mcTitle{
+      font-weight: 900;
+      letter-spacing: .35px;
+      color: #064e3b;
+      text-transform: uppercase;
+      font-size: 12px;
+      opacity: .95;
+    }
+    .dark #mcTitle{ color: #34d399; }
+
+    #mcStatus{
+      font-weight: 900;
+      font-size: 12px;
+      color: #166534;
+      letter-spacing: .2px;
+      padding: .25rem .55rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(34,197,94,.35);
+      background: rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+      white-space: nowrap;
+    }
+    .dark #mcStatus{
+      color: #4ade80;
+      border-color: rgba(34,197,94,.42);
+      background: rgba(0,0,0,.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .mc-grid{
+      display:flex;
+      gap: .75rem;
+      align-items: stretch;
+      margin-top: .6rem;
+    }
+    .mc-stats{
+      flex: 1 1 55%;
+      display:flex;
+      flex-direction: column;
+      gap: .4rem;
+      min-width: 0;
+    }
+    .mc-row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: .6rem;
+      padding: .28rem .45rem;
+      border-radius: .75rem;
+      border: 1px solid rgba(34,197,94,.22);
+      background: rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.2;
+      color: rgba(15,23,42,.92);
+      white-space: nowrap;
+    }
+    .dark .mc-row{
+      background: rgba(0,0,0,.22);
+      border-color: rgba(34,197,94,.26);
+      color: rgba(234,255,242,.9);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .mc-row .k{ opacity: .82; }
+    .mc-row .v{ font-weight: 900; letter-spacing: .2px; }
+
+    .mc-chartWrap{
+      flex: 1 1 45%;
+      border-radius: .85rem;
+      border: 1px solid rgba(34,197,94,.24);
+      background: rgba(0,0,0,.16);
+      overflow: hidden;
+      position: relative;
+      min-height: 112px;
+    }
+    .dark .mc-chartWrap{
+      background: rgba(0,0,0,.32);
+      border-color: rgba(34,197,94,.28);
+    }
+    .mc-chartWrap::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(160px 120px at 28% 22%, rgba(34,197,94,.22), transparent 62%);
+      mix-blend-mode: screen;
+      pointer-events:none;
+      opacity: .9;
+    }
+    #mcChart{
+      width: 100%;
+      height: 100%;
+      display:block;
+    }
+
+    .mc-progress{
+      height: 9px;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: .65rem;
+      border: 1px solid rgba(34,197,94,.22);
+      background: rgba(0,0,0,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+    }
+    .dark .mc-progress{
+      background: rgba(0,0,0,.26);
+      border-color: rgba(34,197,94,.26);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    #mcBar{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(34,197,94,.25), rgba(34,197,94,.88), rgba(34,197,94,.25));
+      border-radius: 9999px;
+      transform: translateZ(0);
+    }
+
+    #mcStream{
+      margin-top: .6rem;
+      padding: .5rem .6rem;
+      border-radius: .85rem;
+      border: 1px solid rgba(34,197,94,.20);
+      background: rgba(255,255,255,.05);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      line-height: 1.25;
+      color: rgba(15,23,42,.86);
+      max-height: 6.8em;
+      overflow: hidden;
+      white-space: pre;
+      opacity: .95;
+    }
+    .dark #mcStream{
+      background: rgba(0,0,0,.22);
+      border-color: rgba(34,197,94,.24);
+      color: rgba(234,255,242,.82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      opacity: .92;
+    }
+
+    #resultLayer.result-pulse::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: inherit;
+      border: 1px solid rgba(34,197,94,.78);
+      box-shadow: 0 0 26px rgba(34,197,94,.25);
+      opacity: 0;
+      pointer-events:none;
+      animation: rp 0.9s ease-out 1;
+    }
+    @keyframes rp{
+      0%   { opacity: 0; transform: scale(.985); }
+      18%  { opacity: 1; transform: scale(1.00); }
+      100% { opacity: 0; transform: scale(1.05); }
+    }
+
+    @media (max-width: 380px){
+      .a-overlay-card{ min-width: 88%; max-width: 96%; padding: .8rem .85rem; }
+      .mc-grid{ flex-direction: column; }
+      .mc-chartWrap{ min-height: 92px; }
     }
   </style>
 </head>
-<body class="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white transition-colors relative diamond-bg">
 
-  <!-- Barra superior fija (как на main) -->
-<header class="fixed top-0 left-0 right-0 z-30 backdrop-blur-md bg-white/70 dark:bg-black/40 border-b border-green-700/30">
-  <div class="max-w-[74rem] mx-auto px-4 py-2 flex items-center justify-between gap-3 sm:gap-4 flex-wrap">
-    <!-- Логотип (кнопка Домой) -->
-    <a href="main.html" class="shrink-0 flex items-center gap-2">
-      <img
-        src="images/PredictorPro.jpg"
-        alt="PredictorPro"
-        class="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full border-4 border-green-700 object-cover"
-      />
-    </a>
+<body class="min-h-screen flex flex-col bg-white dark:bg-black text-gray-900 dark:text-white transition-colors relative diamond-bg" style="min-height:100dvh;">
 
-    <!-- Правый блок: индикатор + язык + тема -->
-    <div class="flex items-center gap-3 sm:gap-4">
-      <!-- Индикатор онлайн (как доп. элемент; можно скрыть, если его нет на main) -->
-      <div class="flex items-center gap-2 px-2.5 py-1 rounded-full border border-green-600/70 bg-white/60 dark:bg-white/10 shadow-md">
-        <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-        </span>
-        <span id="onlineLabel" class="hidden sm:inline text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">En línea</span>
-        <span id="activeUsersCount" class="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">—</span>
-      </div>
+</body>
+  <header class="fixed top-0 left-0 right-0 z-30 lgx-nav lgx-blur">
+    <div class="max-w-[74rem] mx-auto px-4 py-2 flex items-center justify-between gap-3 sm:gap-4 flex-wrap">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <a href="main.html"
+           class="shrink-0 inline-flex items-center justify-center p-0 transition-transform hover:scale-[1.02] focus:outline-none"
+           aria-label="Home">
+          <img
+            src="images/logo-predictorpro-liquid.png"
+            alt="PredictorPro"
+            onerror="this.onerror=null; this.src='images/PredictorPro.jpg';"
+            class="h-[4.25rem] sm:h-[5.25rem] lg:h-[5.75rem] w-auto select-none pointer-events-none -my-2" />
+        </a>
 
-      <!-- Кнопка выбора языка (идентичные id и поведение) -->
-      <div class="relative">
-        <button
-          id="langBtn"
-          class="h-10 px-4 rounded-full bg-gray-200 text-gray-900 shadow ring-2 ring-green-600 text-sm font-semibold flex items-center gap-2"
-          aria-haspopup="true" aria-expanded="false" aria-label="Select language"
-        >
-          <span>🌐</span><span id="langBtnLabel">العربية</span>
-        </button>
-        <div
-          id="langMenu"
-          class="hidden absolute right-0 mt-2 w-18 bg-gray-800 text-white rounded-lg shadow-lg border border-green-700/60 overflow-hidden text-sm z-50"
-        >
-          <button data-lang="ar" data-dir="rtl"  data-langtag="ar-DZ" class="w-full text-right px-3 py-2 hover:bg-gray-700">العربية</button>
-          <button data-lang="es" data-dir="ltr"  data-langtag="es-PE" class="w-full text-left  px-3 py-2 hover:bg-gray-700">Español</button>
-          <button data-lang="en" data-dir="ltr"  data-langtag="en"     class="w-full text-left  px-3 py-2 hover:bg-gray-700">English</button>
-          <button data-lang="pl" data-dir="ltr"  data-langtag="pl"     class="w-full text-left  px-3 py-2 hover:bg-gray-700">Polski</button>
-          <button data-lang="fr" data-dir="ltr"  data-langtag="fr"     class="w-full text-left  px-3 py-2 hover:bg-gray-700">Français</button>
+        <div class="nav-badge online-pill text-[13px] font-semibold text-green-700 dark:text-green-400 relative">
+          <span class="online-signal" aria-hidden="true">
+            <span class="wave wave1"></span>
+            <span class="wave wave2"></span>
+            <span class="wave wave3"></span>
+            <span class="online-dot"></span>
+          </span>
+          <span id="activeUsersCount" class="tabular-nums leading-none">—</span>
+          <span id="onlineTooltip" class="online-tooltip">Users online</span>
         </div>
       </div>
 
-      <!-- Переключатель темы -->
-      <button
-        id="themeToggle"
-        class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 shadow-lg transition-colors ring-2 ring-green-600 ring-offset-2 ring-offset-transparent"
-        onclick="toggleTheme()"
-        aria-label="Cambiar tema"
-      >🌙</button>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <button id="mobileMenuToggle"
+                class="sm:hidden mobile-burger focus:outline-none"
+                aria-label="Menu"
+                aria-expanded="false"
+                type="button">
+          <span class="hm-line"></span>
+          <span class="hm-line"></span>
+          <span class="hm-line"></span>
+        </button>
+
+        <div id="desktopTopActions" class="hidden sm:flex items-center gap-3 sm:gap-4">
+          <div class="relative flex flex-col items-center w-16 sm:w-20">
+            <button id="langBtn"
+                    class="inline-flex items-center justify-center p-0 m-0 bg-transparent border-0 shadow-none rounded-none transition-transform hover:scale-105 focus:outline-none"
+                    aria-haspopup="true" aria-expanded="false" aria-label="Select language"
+                    type="button">
+              <img
+                src="images/lang-button.png"
+                alt=""
+                class="w-16 h-16 sm:w-20 sm:h-20 object-contain block pointer-events-none select-none" />
+              <span id="langBtnLabel" class="sr-only">Español</span>
+            </button>
+            <span id="langCaption" class="mt-1 text-[11px] leading-none font-semibold text-green-700 dark:text-green-400 whitespace-nowrap select-none">
+              Idioma
+            </span>
+
+            <div id="langMenu" class="hidden w-32 glass-menu text-sm py-1">
+              <button data-lang="ar" class="w-full text-right px-3 py-2 focus:outline-none" type="button">العربية</button>
+              <button data-lang="es" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Español</button>
+              <button data-lang="en" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">English</button>
+              <button data-lang="pl" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Polski</button>
+              <button data-lang="fr" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Français</button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex flex-col items-center gap-1 w-16 sm:w-20">
+              <button id="faqButtonTop"
+                      class="inline-flex items-center justify-center p-0 m-0 bg-transparent border-0 shadow-none rounded-none transition-transform hover:scale-105 focus:outline-none"
+                      aria-label="FAQ"
+                      type="button">
+                <img
+                  src="images/faq-logo.png"
+                  alt=""
+                  class="w-16 h-16 sm:w-20 sm:h-20 object-contain block pointer-events-none select-none"
+                  onerror="(function(img){
+                    const list=[
+                      'images/faq-logo.png','images/faq-logo.webp','images/faq-logo.jpg','images/faq-logo.jpeg',
+                      'images/FAQ-logo.png','images/FAQ-logo.webp','images/FAQ-logo.jpg','images/FAQ-logo.jpeg',
+                      'images/faq.png','images/faq.webp','images/faq.jpg','images/faq.jpeg'
+                    ];
+                    const i=(parseInt(img.dataset.try||'0',10));
+                    if(i < list.length-1){ img.dataset.try=String(i+1); img.src=list[i+1]; }
+                    else { img.style.display='none'; }
+                  })(this);" />
+              </button>
+              <span class="text-[11px] leading-none font-semibold text-green-700 dark:text-green-400 whitespace-nowrap select-none pointer-events-none">FAQ</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-1 w-16 sm:w-20">
+              <a href="https://t.me/Pedro_PredictorPro_bot"
+                 class="support-top inline-flex items-center justify-center p-0 m-0 bg-transparent border-0 shadow-none rounded-none transition-transform hover:scale-105 focus:outline-none"
+                 target="_blank" rel="noopener noreferrer"
+                 aria-label="Support chat">
+                <img
+                  src="images/support-icon.png"
+                  alt="Support"
+                  class="w-16 h-16 sm:w-20 sm:h-20 object-contain block pointer-events-none select-none"
+                  onerror="this.onerror=null; this.src='images/—Pngtree—technical support_3767452.png';"
+                />
+              </a>
+              <span id="supportLabelTop" class="text-[11px] leading-none font-semibold text-green-700 dark:text-green-400 whitespace-nowrap select-none pointer-events-none">
+                Soporte
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="mobileMenuWrap" class="sm:hidden fixed inset-0 z-[9988]">
+    <div id="mobileMenuBg" class="absolute inset-0 lang-modal-backdrop"></div>
+
+    <div id="mobileMenuPanel"
+         class="absolute right-4 w-56 lgx-card lgx-blur lgx-sheen p-3"
+         style="top: calc(var(--pp-header-h) + .5rem);">
+      <div class="flex flex-col gap-2">
+        <button id="mobileLangBtn" class="mobile-menu-item focus:outline-none" aria-label="Language" type="button">
+          <img src="images/lang-button.png" alt="" class="w-10 h-10 object-contain pointer-events-none select-none">
+          <span id="mobileLangText" class="mobile-menu-label">Idioma</span>
+        </button>
+
+        <button id="mobileFaqBtn" class="mobile-menu-item focus:outline-none" aria-label="FAQ" type="button">
+          <img src="images/faq-logo.png" alt="" class="w-10 h-10 object-contain pointer-events-none select-none"
+               onerror="(function(img){
+                 const list=[
+                   'images/faq-logo.png','images/faq-logo.webp','images/faq-logo.jpg','images/faq-logo.jpeg',
+                   'images/FAQ-logo.png','images/FAQ-logo.webp','images/FAQ-logo.jpg','images/FAQ-logo.jpeg',
+                   'images/faq.png','images/faq.webp','images/faq.jpg','images/faq.jpeg'
+                 ];
+                 const i=(parseInt(img.dataset.try||'0',10));
+                 if(i < list.length-1){ img.dataset.try=String(i+1); img.src=list[i+1]; }
+                 else { img.style.display='none'; }
+               })(this);">
+          <span class="mobile-menu-label">FAQ</span>
+        </button>
+
+        <a id="mobileSupportBtn"
+           href="https://t.me/Pedro_PredictorPro_bot"
+           target="_blank" rel="noopener noreferrer"
+           class="mobile-menu-item focus:outline-none"
+           aria-label="Support chat">
+          <img src="images/support-icon.png" alt="Support" class="w-10 h-10 object-contain pointer-events-none select-none"
+               onerror="this.onerror=null; this.src='images/—Pngtree—technical support_3767452.png';">
+          <span id="mobileSupportText" class="mobile-menu-label">Soporte</span>
+        </a>
+      </div>
     </div>
   </div>
-</header>
 
-  <!-- Botón de Preguntas Frecuentes -->
-  <div
-    id="faqButton"
-    class="fixed left-4 bottom-4 sm:top-1/2 sm:bottom-auto sm:right-4 sm:left-auto sm:transform sm:-translate-y-1/2
-           flex items-center space-x-2 p-2 bg-gray-200 dark:bg-gray-800 rounded-lg cursor-pointer shadow transition-colors z-20"
-  > <!-- ✅ на мобилках слева, чтобы не перекрывать поддержку -->
-    <img
-      src="images/311092c3467c45c938fd5b63ac29281a.png"
-      alt="Preguntas frecuentes"
-      class="w-8 h-8"
-    />
-    <span id="faqButtonLabel" class="font-semibold text-gray-900 dark:text-white">
-      Preguntas frecuentes
-    </span>
-  </div>
+  <div id="langOverlay" class="hidden fixed inset-0 z-[9998] flex items-center justify-center px-4">
+    <div id="langOverlayBg" class="absolute inset-0 lang-modal-backdrop"></div>
 
-  <!-- Panel de FAQ -->
-  <div
-    id="faqPanel"
-    class="fixed left-4 right-4 bottom-24 sm:left-auto sm:right-4 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 mt-14 w-auto sm:w-80 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-4 hidden text-gray-900 dark:text-white z-50"
-  > <!-- ✅ z-50 чтобы крестик всегда кликабелен -->
-    <button
-      id="faqClose"
-      class="absolute top-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xl leading-none"
-    >&times;</button>
-    <h3 id="faqTitle" class="text-lg font-semibold mb-2">Reglas del juego «Aviador»</h3>
-    <p id="faqText" class="text-sm mb-4">
-      El juego «Aviador» ofrece pronósticos de coeficientes para la próxima ronda.
-      Haga clic en «Obtener pronóstico», espere los resultados y asegure sus ganancias.
-      Cuanto más use la herramienta, más precisas serán nuestras señales.
-    </p>
-  </div>
+    <div class="relative w-full max-w-xs sm:max-w-sm glass-menu">
+      <button id="langBackBtn" class="relative w-full px-3 py-2 font-semibold focus:outline-none" type="button">
+        <span class="pp-back-icon absolute left-3 top-1/2 -translate-y-1/2 text-green-700 dark:text-green-400" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span id="langBackText" class="block w-full text-center">Back</span>
+      </button>
+      <div class="h-px bg-black/10 dark:bg-white/10"></div>
 
-  <!-- Контент с отступами под фикс. шапку и плавающие кнопки -->
-  <main class="flex flex-col items-center pt-28 sm:pt-36 lg:pt-48 pb-44 sm:pb-28 px-4 space-y-6"> <!-- ✅ больше нижний отступ на мобилках -->
-    <!-- Ventana de pronóstico -->
-    <div
-      id="forecastWindow"
-      class="bg-gray-100 dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg border-2 border-green-700 transition-colors max-w-md w-full text-center z-10"
-    > <!-- ✅ мягче паддинги на мобилках -->
-      <h2 id="forecastTitle" class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-        Pronóstico «Aviador»
-      </h2>
-      <p id="aviatorForecast" class="text-xl text-gray-700 dark:text-gray-300">
-        Haga clic en el botón para obtener un pronóstico
-      </p>
-      <p id="recommendation" class="mt-2 text-gray-600 dark:text-gray-400"></p>
+      <div id="langModalList" class="py-1 text-sm">
+        <button data-lang="ar" class="w-full text-right px-3 py-2 focus:outline-none" type="button">العربية</button>
+        <button data-lang="es" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Español</button>
+        <button data-lang="en" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">English</button>
+        <button data-lang="pl" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Polski</button>
+        <button data-lang="fr" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Français</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Botón de pronóstico -->
-    <button
-      id="fetchBtn"
-      class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-semibold transition-colors z-10 w-full max-w-md"
-    > <!-- ✅ на мобилках тянется на ширину карточки -->
-      Obtener pronóstico
-    </button>
+  <div id="faqOverlay" class="hidden fixed inset-0 z-[9997] flex items-center justify-center px-4">
+    <div id="faqOverlayBg" class="absolute inset-0 lang-modal-backdrop"></div>
 
-    <!-- Historial de pronósticos -->
-    <div id="historyContainer" class="hidden flex flex-col items-center mt-4 w-full max-w-md z-10">
-      <h3 id="historyTitle" class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-        Historial de los últimos pronósticos
-      </h3>
-      <ul id="historyList" class="w-full space-y-1 text-gray-700 dark:text-gray-300 max-h-60 overflow-y-auto">
-        <!-- Aquí aparecerán los registros del historial -->
-      </ul> <!-- ✅ прокрутка на маленьких экранах -->
+    <div class="relative w-full max-w-xs sm:max-w-sm glass-menu">
+      <button id="faqBackBtn" class="relative w-full px-3 py-2 font-semibold focus:outline-none" type="button">
+        <span class="pp-back-icon absolute left-3 top-1/2 -translate-y-1/2 text-green-700 dark:text-green-400" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span id="faqBackText" class="block w-full text-center">Back</span>
+      </button>
+      <div class="h-px bg-black/10 dark:bg-white/10"></div>
+
+      <div id="faqPanel" class="p-4 max-h-[70vh] overflow-auto">
+        <h3 id="faqTitle" class="text-lg font-semibold mb-2">Reglas del juego «Aviador»</h3>
+        <p id="faqText" class="text-sm">
+          El juego «Aviador» ofrece pronósticos de coeficientes para la próxima ronda.
+          Haga clic en «Obtener pronóstico», espere los resultados y asegure sus ganancias.
+          Cuanto más use la herramienta, más precisas serán nuestras señales.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <main class="flex-1 flex flex-col items-center pt-28 sm:pt-36 lg:pt-48 pb-8 sm:pb-10 px-4">
+    <div class="w-full max-w-md space-y-6">
+
+      <div id="forecastWindow" class="lgx-card lgx-blur lgx-sheen">
+        <canvas id="chartCanvas"></canvas>
+        <div id="chartRightGlow"></div>
+
+        <h2 id="forecastTitle" class="sr-only">Pronóstico «Aviador»</h2>
+        <p id="aviatorForecast" class="sr-only"></p>
+
+        <div id="forecastOverlay">
+          <div id="analysisLayer" class="hidden a-overlay-card">
+            <div class="a-scan" aria-hidden="true"></div>
+
+            <div class="mc-title-row">
+              <span id="mcTitle">Monte Carlo</span>
+              <span id="mcStatus">Sampling…</span>
+            </div>
+
+            <div id="analysisText">
+              <span id="analysisLabel">Analizando datos</span>
+              <span class="a-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            </div>
+
+            <div class="mc-grid">
+              <div class="mc-stats">
+                <div class="mc-row"><span class="k" id="mcLabelSamples">Samples</span><span class="v" id="mcSamples">—</span></div>
+                <div class="mc-row"><span class="k" id="mcLabelMean">Mean μ</span><span class="v" id="mcMean">—</span></div>
+                <div class="mc-row"><span class="k" id="mcLabelSigma">Spread σ</span><span class="v" id="mcSigma">—</span></div>
+                <div class="mc-row"><span class="k" id="mcLabelConf">95% CI</span><span class="v" id="mcConf">—</span></div>
+              </div>
+
+              <div class="mc-chartWrap">
+                <canvas id="mcChart"></canvas>
+              </div>
+            </div>
+
+            <div class="mc-progress" aria-hidden="true">
+              <div id="mcBar"></div>
+            </div>
+
+            <pre id="mcStream">—</pre>
+          </div>
+
+          <div id="resultLayer" class="hidden a-overlay-card">
+            <div id="coefText">—</div>
+
+            <!-- ✅ Процент успеха (для всех диапазонов 1.00×–50.00×) -->
+            <div id="successText"
+                 class="hidden mt-2 text-[13px] sm:text-sm font-extrabold text-green-950 dark:text-green-200 text-center"
+                 style="text-shadow: 0 10px 28px rgba(0,0,0,.32);"></div>
+
+            <!-- ✅ Совет (для 1.00×–2.00×, 2.01×–3.00×, 3.01×–5.00×, 5.01×–10.00×, 10.01×–20.00× и 20.01×–50.00×) -->
+            <div id="tipText"
+                 class="hidden mt-1 text-[13px] sm:text-sm font-semibold text-slate-900 dark:text-slate-100 text-center"
+                 style="text-shadow: 0 10px 28px rgba(0,0,0,.22);"></div>
+          </div>
+        </div>
+      </div>
+
+      <button id="fetchBtn"
+              class="lgx-btn solid w-full py-3 text-[15px] sm:text-base text-green-950 dark:text-white"
+              type="button">
+        Obtener pronóstico
+      </button>
+
+      <div id="historyContainer" class="hidden w-full">
+        <h3 id="historyTitle" class="text-sm sm:text-base font-semibold mb-2 text-black dark:text-white text-center">
+          Historial de los últimos pronósticos
+        </h3>
+
+        <div class="lgx-card lgx-blur lgx-sheen p-3">
+          <ul id="historyList" class="w-full space-y-2 max-h-60 overflow-y-auto"></ul>
+        </div>
+      </div>
+
     </div>
   </main>
 
-  <!-- Кнопка поддержки + подпись (закреплено) -->
-  <div class="fixed bottom-4 right-4 z-30 flex flex-col items-center space-y-2 p-3 rounded-2xl border-2 border-green-700/70 bg-white/70 dark:bg-white/10 backdrop-blur-md shadow-xl">
-    <a href="https://t.me/Pedro_PredictorPro_bot"
-       class="bg-gray-200 dark:bg-gray-800 p-2 rounded-full border-4 border-green-700 transition-transform hover:scale-105"
-       target="_blank" rel="noopener noreferrer" aria-label="Chat de soporte">
-      <img
-        src="images/—Pngtree—technical support_3767452.png"
-        alt="Soporte"
-        class="w-14 h-14 sm:w-16 sm:h-16 filter dark:invert"
-      />
-    </a>
-    <span id="supportLabel" class="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">Chat de soporte</span>
+  <div class="w-full lgx-nav lgx-blur" style="
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  border-top: 1px solid rgba(34,197,94,.35);
+  margin: 0;
+">
+  <div class="max-w-[74rem] mx-auto px-4 py-2 text-center text-[12px] sm:text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
+    Copyright © 2025-2026 "Predictor-Pro". <span id="rightsLabel">All rights reserved.</span>
   </div>
+</div>
 
   <script>
-    // ===== Тема
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      themeToggle.textContent =
-        document.documentElement.classList.contains('dark') ? '🌞' : '🌙';
-    }
     document.documentElement.classList.add('dark');
-    const themeToggleEl = document.getElementById('themeToggle');
-    if (themeToggleEl) themeToggleEl.textContent = '🌞';
 
-    // ===== FAQ show/hide
-    const faqBtn = document.getElementById('faqButton');
-    const faqPanel = document.getElementById('faqPanel');
-    const faqClose = document.getElementById('faqClose');
-    faqBtn.addEventListener('click', () => faqPanel.classList.toggle('hidden'));
-    faqClose.addEventListener('click', () => faqPanel.classList.toggle('hidden'));
-
-    // ==== Indicador "En línea" (симуляция) ====
-    const usersEl = document.getElementById('activeUsersCount');
-    function updateUsers() {
-      const min = 120, max = 340;
-      usersEl.textContent = Math.floor(min + Math.random() * (max - min));
-    }
-    updateUsers();
-    setInterval(updateUsers, 5000);
-
-    // ===== I18N словарь (aviator)
     const I18N = {
       ar: {
-        langName: 'العربية', langTag:'ar-DZ', dir:'ltr',
-        title: 'PredictorPro – أفياتور',
-        online: 'متصل',
-        forecastTitle: 'توقع «أفياتور»',
-        forecastHint: 'اضغط على الزر للحصول على التوقع',
-        btnGet: 'الحصول على التوقع',
-        wait: 'يرجى الانتظار، جارٍ جلب بيانات الجولة التالية',
-        faqButton: 'الأسئلة الشائعة',
-        faqTitle: 'قواعد لعبة «أفياتور»',
-        faqText: 'تعرض لعبة «أفياتور» توقعات للمعامل في الجولة التالية. اضغط «الحصول على التوقع»، انتظر النتائج وثبِّت أرباحك. كلما استخدمت الأداة أكثر أصبحت إشاراتنا أدق.',
-        historyTitle: 'سجل آخر التوقعات',
-        support: 'دردشة الدعم',
-        recs: [
-          'معامل جيد، يمكنك زيادة المبلغ.',
-          'احتمال فوز مرتفع، المخاطرة مبررة.',
-          'معامل متوسط، تصرّف بحذر.',
-          'ربح صغير، نوصي بمتوسط الرهانات.',
-          'نتيجة ممتازة، ثبّت أرباحك.',
-          'احتمال يتجاوز 80%، يمكن رفع الرهان.',
-          'نوصي بالانتظار قبل الرهان التالي.',
-          'احتمال الهبوط مرتفع، كن حذرًا.',
-          'وقت مثالي للدخول، تصرّف الآن.',
-          'إشارة متوسطة، من الأفضل عدم المخاطرة.'
+        langName:'العربية', langTag:'ar-DZ', dir:'rtl',
+        title:'PredictorPro – أفياتور', back:'رجوع', usersOnline:'المستخدمون عبر الإنترنت',
+        support:'الدعم', langCaption:'اللغة', forecastTitle:'توقع «أفياتور»',
+        btnGet:'الحصول على التوقع', wait:'جارٍ تحليل البيانات',
+        faqTitle:'قواعد لعبة «أفياتور»', faqText:'تعرض لعبة «أفياتور» توقعات للمعامل في الجولة التالية.',
+        historyTitle:'سجل آخر التوقعات', rights:'جميع الحقوق محفوظة.',
+        mcTitle:'Monte Carlo', mcStatus:'أخذ عينات…', mcLocking:'تثبيت…', mcLocked:'تم',
+        mcSamples:'العينات', mcMean:'المتوسط μ', mcSigma:'الانحراف σ', mcCI:'فاصل 95%',
+
+        successLabel:'نسبة النجاح',
+
+        // 1.00×–2.00×
+        tips:[
+          'فرصة مليحة باش تسكّر بربح.',
+          'سيڨنال مليح للّعب بحذر.',
+          'دروك راه وقت مليح باش تدخل.',
+          'كاين شانس كبير تربح.',
+          'فرصة مليحة باش تدير الرهان.'
+        ],
+
+        // 2.01×–3.00×
+        tips_2_3:[
+          'توازن الريسك والربح راهو مليح دروك.',
+          'احتمال تربح بهدوء راهو كبير.',
+          'ريسك متوسط — الوقت مناسب.',
+          'خير تمشي بالخطة بلا استعجال.',
+          'تقدر تدخل بريسك معتدل.'
+        ],
+
+        // 3.01×–5.00×
+        tips_3_5:[
+          'ثبّت بكري — ما تجرّش للحدّ.',
+          'خير نقص قيمة الرهان.',
+          'كاين شانس، بصح هاد الرانج يحتاج حذر.',
+          'الريسك فوق المتوسط — راهن غير بالخطة.',
+          'كاين بوتنسيال، بصح ما تعليش التوقعات.'
+        ],
+
+        // 5.01×–10.00×
+        tips_5_10:[
+          'الريسك عالي — راهن غير بأقل مبلغ.',
+          'ادخل غير مع احترام صارم للخطة.',
+          'البوتنسيال عالي، بصح الريسك ولى جدي.',
+          'الرهان ممكن، بصح لازم هامش أمان في الريسك.',
+          'ما تعليش التوقعات — هاد الرانج فيه خطورة.'
+        ],
+
+        // 10.01×–20.00×
+        tips_10_20:[
+          'خطر عالي بزاف — الدخول غير بأقل مبلغ.',
+          'ما تزيدش المبلغ — احتمال الخطر عالي بزاف.',
+          'إذا عندك شك — خير تفوت هاد الكوت.',
+          'هذي منطقة خطر مرتفع — الحذر ضروري.',
+          'تم رصد معامل عالي — احتمال النجاح منخفض.'
+        ],
+
+        // 20.01×–50.00×
+        tips_20_50:[
+          'خطر مرتفع بزاف بزاف — الدخول غير منصوح.',
+          'احتمال النجاح ضعيف بزاف — خير تفوت.',
+          'ما تزيدش المبلغ — الخسارة في هاد الرانج تجي بسرعة.',
+          'هاد كوت إكستريم وخطير — لازم أقصى درجات الحذر.',
+          'تم رصد معامل مرتفع بزاف — فرصة النجاح شبه منعدمة.'
         ]
       },
+
       es: {
-        langName: 'Español', langTag:'es-PE', dir:'ltr',
-        title: 'PredictorPro – Aviador',
-        online: 'En línea',
-        forecastTitle: 'Pronóstico «Aviador»',
-        forecastHint: 'Haga clic en el botón para obtener un pronóstico',
-        btnGet: 'Obtener pronóstico',
-        wait: 'Espere, obteniendo datos para la siguiente ronda',
-        faqButton: 'Preguntas frecuentes',
-        faqTitle: 'Reglas del juego «Aviador»',
-        faqText: 'El juego «Aviador» ofrece pronósticos de coeficientes para la próxima ronda. Haga clic en «Obtener pronóstico», espere los resultados y asegure sus ganancias. Cuanto más use la herramienta, más precisas serán nuestras señales.',
-        historyTitle: 'Historial de los últimos pronósticos',
-        support: 'Chat de soporte',
-        recs: [
-          'Buen coeficiente, puede apostar una suma mayor.',
-          'Alta probabilidad de victoria, el riesgo vale la pena.',
-          'Coeficiente medio, proceda con cautela.',
-          'Ganancia pequeña, recomendamos promediar las apuestas.',
-          'Excelente resultado, asegure sus ganancias.',
-          'Probabilidad superior al 80%, puede aumentar la apuesta.',
-          'Recomendamos esperar antes de la próxima apuesta.',
-          'Mayor probabilidad de caída, sea cauteloso.',
-          'Momento ideal para entrar, actúe ahora.',
-          'Señal moderada, es mejor no arriesgarse.'
+        langName:'Español', langTag:'es-PE', dir:'ltr',
+        title:'PredictorPro – Aviador', back:'Atrás', usersOnline:'Usuarios en línea',
+        support:'Soporte', langCaption:'Idioma', forecastTitle:'Pronóstico «Aviador»',
+        btnGet:'Obtener pronóstico', wait:'Analizando datos',
+        faqTitle:'Reglas del juego «Aviador»', faqText:'El juego «Aviador» ofrece pronósticos de coeficientes para la próxima ronda.',
+        historyTitle:'Historial de los últimos pronósticos', rights:'Todos los derechos reservados.',
+        mcTitle:'Monte Carlo', mcStatus:'Muestreo…', mcLocking:'Fijando…', mcLocked:'Bloqueado',
+        mcSamples:'Muestras', mcMean:'Media μ', mcSigma:'Dispersión σ', mcCI:'IC 95%',
+
+        successLabel:'Porcentaje de éxito',
+
+        // 1.00×–2.00×
+        tips:[
+          'Buen chance de cerrar en positivo.',
+          'Buena señal para jugar con cuidado.',
+          'Ahora es un buen momento para entrar.',
+          'Alta probabilidad de ganancia.',
+          'Buena oportunidad para apostar.'
+        ],
+
+        // 2.01×–3.00×
+        tips_2_3:[
+          'El equilibrio entre riesgo y ganancia es bueno ahora.',
+          'La probabilidad de un resultado positivo tranquilo es alta.',
+          'Riesgo medio: el momento es adecuado.',
+          'Mejor seguir el plan sin prisa.',
+          'Se puede entrar con un riesgo moderado.'
+        ],
+
+        // 3.01×–5.00×
+        tips_3_5:[
+          'Cierra antes — no lo lleves al límite.',
+          'Mejor reducir el monto de la apuesta.',
+          'Hay oportunidad, pero este rango exige cautela.',
+          'El riesgo es superior al promedio — apuesta solo con plan.',
+          'Hay potencial, pero no subas demasiado las expectativas.'
+        ],
+
+        // 5.01×–10.00×
+        tips_5_10:[
+          'El riesgo es alto: apuesta solo el monto mínimo.',
+          'Entra solo con cumplimiento estricto del plan.',
+          'El potencial es alto, pero el riesgo ya es serio.',
+          'La apuesta es posible, pero solo con margen de riesgo.',
+          'No eleves las expectativas: este es un rango riesgoso.'
+        ],
+
+        // 10.01×–20.00×
+        tips_10_20:[
+          'Riesgo muy alto: entra solo con el monto mínimo.',
+          'No aumentes el monto: la probabilidad de riesgo es demasiado alta.',
+          'Si tienes dudas, mejor omite este coeficiente.',
+          'Esta es una zona de riesgo elevado: la cautela es obligatoria.',
+          'Coeficiente alto detectado: baja probabilidad de éxito.'
+        ],
+
+        // 20.01×–50.00×
+        tips_20_50:[
+          'Riesgo críticamente alto: no se recomienda entrar.',
+          'La probabilidad de éxito es extremadamente baja: mejor omitir.',
+          'No aumentes el monto: las pérdidas en este rango ocurren rápido.',
+          'Este es un coeficiente extremadamente riesgoso: se requiere máxima cautela.',
+          'Coeficiente extremadamente alto detectado: la probabilidad de éxito es mínima.'
         ]
       },
+
       en: {
-        langName: 'English', langTag:'en', dir:'ltr',
-        title: 'PredictorPro – Aviator',
-        online: 'Online',
-        forecastTitle: 'Aviator Forecast',
-        forecastHint: 'Click the button to get a forecast',
-        btnGet: 'Get forecast',
-        wait: 'Please wait, fetching data for the next round',
-        faqButton: 'FAQ',
-        faqTitle: 'Aviator Game Rules',
-        faqText: 'The “Aviator” game provides odds forecasts for the next round. Click “Get forecast”, wait for the result and lock in your profit. The more you use the tool, the more accurate the signals become.',
-        historyTitle: 'Recent forecasts history',
-        support: 'Support chat',
-        recs: [
-          'Good odds, you can bet more.',
-          'High chance of winning, risk is justified.',
-          'Medium odds, proceed carefully.',
-          'Small profit, consider averaging bets.',
-          'Excellent result, secure your profit.',
-          'Probability above 80%, you may increase the bet.',
-          'We recommend waiting before the next bet.',
-          'Higher chance of drop, be cautious.',
-          'Perfect moment to enter, act now.',
-          'Moderate signal, better not to risk.'
+        langName:'English', langTag:'en', dir:'ltr',
+        title:'PredictorPro – Aviator', back:'Back', usersOnline:'Users online',
+        support:'Support', langCaption:'Language', forecastTitle:'Aviator Forecast',
+        btnGet:'Get prediction', wait:'Analyzing data',
+        faqTitle:'Aviator Game Rules', faqText:'The “Aviator” game provides odds forecasts for the next round.',
+        historyTitle:'Recent prediction history', rights:'All rights reserved.',
+        mcTitle:'Monte Carlo', mcStatus:'Sampling…', mcLocking:'Locking…', mcLocked:'Locked',
+        mcSamples:'Samples', mcMean:'Mean μ', mcSigma:'Spread σ', mcCI:'95% CI',
+
+        successLabel:'Success rate',
+
+        // 1.00×–2.00×
+        tips:[
+          'Good chance to close in profit.',
+          'Good signal for a careful play.',
+          'Now is a good time to enter.',
+          'High chance of profit.',
+          'Good opportunity to place a bet.'
+        ],
+
+        // 2.01×–3.00×
+        tips_2_3:[
+          'The risk–reward balance looks good right now.',
+          'The chance of a calm profit is high.',
+          'Medium risk — good timing.',
+          'Better to follow the plan, no rush.',
+          'You can enter with moderate risk.'
+        ],
+
+        // 3.01×–5.00×
+        tips_3_5:[
+          'Cash out earlier — do not push it to the limit.',
+          'Better reduce the stake amount.',
+          'There is a chance, but this range requires caution.',
+          'Risk is above average — bet only with a plan.',
+          'There is potential, but do not raise expectations too much.'
+        ],
+
+        // 5.01×–10.00×
+        tips_5_10:[
+          'Risk is high — bet only the minimum amount.',
+          'Enter only with strict plan discipline.',
+          'Potential is high, but the risk is already serious.',
+          'A bet is possible, but only with risk buffer.',
+          'Do not raise expectations — this is a risky range.'
+        ],
+
+        // 10.01×–20.00×
+        tips_10_20:[
+          'Very high risk — enter only with the minimum amount.',
+          'Do not increase the stake — the risk probability is too high.',
+          'If you have doubts, it is better to skip this coefficient.',
+          'This is a high-risk zone — caution is mandatory.',
+          'High coefficient detected — low probability of success.'
+        ],
+
+        // 20.01×–50.00×
+        tips_20_50:[
+          'Critically high risk — entry is not recommended.',
+          'Probability of success is extremely low — better skip it.',
+          'Do not increase the stake — losses in this range happen quickly.',
+          'This is an extremely risky coefficient — maximum caution is required.',
+          'Extremely high coefficient detected — chance of success is minimal.'
         ]
       },
+
       pl: {
-        langName: 'Polski', langTag:'pl', dir:'ltr',
-        title: 'PredictorPro – Aviator',
-        online: 'Online',
-        forecastTitle: 'Prognoza „Aviator”',
-        forecastHint: 'Kliknij przycisk, aby otrzymać prognozę',
-        btnGet: 'Pobierz prognozę',
-        wait: 'Proszę czekać, pobieranie danych do następnej rundy',
-        faqButton: 'FAQ',
-        faqTitle: 'Zasady gry „Aviator”',
-        faqText: 'Gra „Aviator” podaje prognozy kursów na następną rundę. Kliknij „Pobierz prognozę”, poczekaj na wynik i zabezpiecz zysk. Im częściej korzystasz, tym dokładniejsze sygnały.',
-        historyTitle: 'Historia ostatnich prognoz',
-        support: 'Czat wsparcia',
-        recs: [
-          'Dobry kurs, możesz zwiększyć stawkę.',
-          'Wysoka szansa wygranej, warto zaryzykować.',
-          'Średni kurs, postępuj ostrożnie.',
-          'Mały zysk, zalecamy uśrednianie stawek.',
-          'Świetny wynik, zabezpiecz zysk.',
-          'Prawdopodobieństwo powyżej 80%, można podnieść stawkę.',
-          'Zalecamy poczekać przed następnym zakładem.',
-          'Większa szansa spadku, bądź ostrożny.',
-          'Idealny moment na wejście, działaj teraz.',
-          'Sygнаł umiarkowany, lepiej nie ryzykować.'
+        langName:'Polski', langTag:'pl', dir:'ltr',
+        title:'PredictorPro – Aviator', back:'Wstecz', usersOnline:'Użytkownicy online',
+        support:'Wsparcie', langCaption:'Język', forecastTitle:'Prognoza „Aviator”',
+        btnGet:'Pobierz prognozę', wait:'Analizowanie danych',
+        faqTitle:'Zasady gry „Aviator”', faqText:'Gra „Aviator” podaje prognozy kursów na następną rundę.',
+        historyTitle:'Historia ostatnich prognoz', rights:'Wszelkie prawa zastrzeżone.',
+        mcTitle:'Monte Carlo', mcStatus:'Próbkowanie…', mcLocking:'Zamykanie…', mcLocked:'Zablokowane',
+        mcSamples:'Próbki', mcMean:'Średnia μ', mcSigma:'Rozrzut σ', mcCI:'PU 95%',
+
+        successLabel:'Procent skuteczności',
+
+        // 1.00×–2.00×
+        tips:[
+          'Duża szansa na zamknięcie na plusie.',
+          'Dobry sygnał do ostrożnej gry.',
+          'To dobry moment na wejście.',
+          'Wysoka szansa na zysk.',
+          'Dobra okazja do postawienia stawki.'
+        ],
+
+        // 2.01×–3.00×
+        tips_2_3:[
+          'Balans ryzyka i zysku jest teraz dobry.',
+          'Szansa na spokojny plus jest wysoka.',
+          'Średnie ryzyko — dobry moment.',
+          'Lepiej trzymać się planu bez pośpiechu.',
+          'Można wejść z umiarkowanym ryzykiem.'
+        ],
+
+        // 3.01×–5.00×
+        tips_3_5:[
+          'Zrealizuj wcześniej — nie ciągnij do granicy.',
+          'Lepiej zmniejszyć kwotę stawki.',
+          'Szansa jest, ale ten zakres wymaga ostrożności.',
+          'Ryzyko powyżej średniej — stawiaj tylko według planu.',
+          'Potencjał jest, ale nie zawyżaj oczekiwań.'
+        ],
+
+        // 5.01×–10.00×
+        tips_5_10:[
+          'Ryzyko jest wysokie — stawiaj tylko minimalną kwotę.',
+          'Wchodź tylko przy ścisłym trzymaniu się planu.',
+          'Potencjał jest wysoki, ale ryzyko jest już poważne.',
+          'Stawka jest możliwa, ale tylko z zapasem na ryzyko.',
+          'Nie zawyżaj oczekiwań — to ryzykowny zakres.'
+        ],
+
+        // 10.01×–20.00×
+        tips_10_20:[
+          'Bardzo wysokie ryzyko — wchodź tylko minimalną kwotą.',
+          'Nie zwiększaj kwoty — prawdopodobieństwo ryzyka jest zbyt wysokie.',
+          'Jeśli masz wątpliwości — lepiej pominąć ten współczynnik.',
+          'To strefa podwyższonego ryzyka — ostrożność jest obowiązkowa.',
+          'Wykryto wysoki współczynnik — niskie prawdopodobieństwo sukcesu.'
+        ],
+
+        // 20.01×–50.00×
+        tips_20_50:[
+          'Krytycznie wysokie ryzyko — wejście nie jest zalecane.',
+          'Prawdopodobieństwo sukcesu jest skrajnie niskie — lepiej pominąć.',
+          'Nie zwiększaj kwoty — straty w tym zakresie pojawiają się szybko.',
+          'To ekstremalnie ryzykowny współczynnik — wymagana maksymalna ostrożność.',
+          'Wykryto ekstremalnie wysoki współczynnik — szansa sukcesu jest minimalna.'
         ]
       },
+
       fr: {
-        langName: 'Français', langTag:'fr', dir:'ltr',
-        title: 'PredictorPro – Aviator',
-        online: 'En ligne',
-        forecastTitle: 'Prévision « Aviator »',
-        forecastHint: 'Cliquez sur le bouton pour obtenir une prévision',
-        btnGet: 'Obtenir une prévision',
-        wait: 'Veuillez patienter, récupération des données pour la prochaine manche',
-        faqButton: 'FAQ',
-        faqTitle: 'Règles du jeu « Aviator »',
-        faqText: 'Le jeu « Aviator » fournit des prévisions de cotes pour la prochaine manche. Cliquez sur « Obtenir une prévision », attendez le résultat et sécurisez vos gains. Plus vous utilisez l’outil, plus nos signaux deviennent précis.',
-        historyTitle: 'Historique des dernières prévisions',
-        support: 'Chat de support',
-        recs: [
-          'Bonne cote, vous pouvez miser davantage.',
-          'Forte probabilité de gain, le risque en vaut la peine.',
-          'Cote moyenne, avancez avec prudence.',
-          'Petit gain, nous recommandons de moyenner les mises.',
-          'Excellent résultat, sécurisez vos gains.',
-          'Probabilité supérieure à 80 %, misez davantage.',
-          'Nous recommandons d’attendre avant la prochaine mise.',
-          'Risque de baisse accru, soyez prudent.',
-          'Moment idéal pour entrer, agissez maintenant.',
-          'Signal modéré, mieux vaut ne pas risquer.'
+        langName:'Français', langTag:'fr', dir:'ltr',
+        title:'PredictorPro – Aviator', back:'Retour', usersOnline:'Utilisateurs en ligne',
+        support:'Support', langCaption:'Langue', forecastTitle:'Prévision « Aviator »',
+        btnGet:'Obtenir une prévision', wait:'Analyse des données',
+        faqTitle:'Règles du jeu « Aviator »', faqText:'Le jeu « Aviator » fournit des prévisions de cotes pour la prochaine manche.',
+        historyTitle:'Historique des dernières prévisions', rights:'Tous droits réservés.',
+        mcTitle:'Monte Carlo', mcStatus:'Échantillonnage…', mcLocking:'Verrouillage…', mcLocked:'Verrouillé',
+        mcSamples:'Échantillons', mcMean:'Moyenne μ', mcSigma:'Dispersion σ', mcCI:'IC 95%',
+
+        successLabel:'Taux de réussite',
+
+        // 1.00×–2.00×
+        tips:[
+          'Bonne chance de clôturer en profit.',
+          'Bon signal pour jouer prudemment.',
+          'C’est un bon moment pour entrer.',
+          'Forte chance de gain.',
+          'Bonne opportunité pour miser.'
+        ],
+
+        // 2.01×–3.00×
+        tips_2_3:[
+          'L’équilibre risque/gain est bon en ce moment.',
+          'La probabilité d’un gain tranquille est élevée.',
+          'Risque moyen — le moment est propice.',
+          'Mieux vaut suivre le plan sans se presser.',
+          'On peut entrer avec un risque modéré.'
+        ],
+
+        // 3.01×–5.00×
+        tips_3_5:[
+          'Encaisse plus tôt — ne pousse pas jusqu’à la limite.',
+          'Mieux vaut réduire le montant de la mise.',
+          'Il y a une chance, mais cette plage demande de la prudence.',
+          'Risque au-dessus de la moyenne — mise seulement selon le plan.',
+          'Il y a du potentiel, mais ne hausse pas trop les attentes.'
+        ],
+
+        // 5.01×–10.00×
+        tips_5_10:[
+          'Le risque est élevé — mise seulement le minimum.',
+          'Entre uniquement avec un respect strict du plan.',
+          'Le potentiel est élevé, mais le risque est déjà sérieux.',
+          'La mise est possible, mais seulement avec une marge de risque.',
+          'Ne hausse pas les attentes — cette plage est risquée.'
+        ],
+
+        // 10.01×–20.00×
+        tips_10_20:[
+          'Risque très élevé — entre seulement avec la mise minimale.',
+          'N’augmente pas la mise — la probabilité de risque est trop élevée.',
+          'Si tu as des doutes, mieux vaut passer cette cote.',
+          'C’est une zone de risque élevé — la prudence est obligatoire.',
+          'Cote élevée détectée — faible probabilité de réussite.'
+        ],
+
+        // 20.01×–50.00×
+        tips_20_50:[
+          'Risque critique — l’entrée n’est pas recommandée.',
+          'La probabilité de réussite est extrêmement faible — mieux vaut passer.',
+          'N’augmente pas la mise — les pertes dans cette plage arrivent vite.',
+          'C’est une cote extrêmement risquée — prudence maximale requise.',
+          'Cote extrêmement élevée détectée — la probabilité de réussite est minimale.'
         ]
       }
     };
 
-    // ===== Элементы для локализации
     const htmlEl = document.documentElement;
-    const titleEl = document.getElementsByTagName('title')[0];
-    const onlineLabel = document.getElementById('onlineLabel');
-    const forecastTitleEl = document.getElementById('forecastTitle');
-    const forecastHintEl = document.getElementById('aviatorForecast');
-    const fetchBtn = document.getElementById('fetchBtn');
-    const historyTitleEl = document.getElementById('historyTitle');
-    const faqBtnLabel = document.getElementById('faqButtonLabel');
-    const faqTitleEl = document.getElementById('faqTitle');
-    const faqTextEl = document.getElementById('faqText');
-    const supportLabel = document.getElementById('supportLabel');
+    const docTitle = document.getElementById('docTitle');
 
     const langBtn = document.getElementById('langBtn');
     const langBtnLabel = document.getElementById('langBtnLabel');
-    const langMenu = document.getElementById('langMenu');
+    const langCaptionEl = document.getElementById('langCaption');
 
-    // Глобальные тексты, зависящие от языка
-    let WAIT_MSG = I18N.es.wait;
-    let recommendations = I18N.es.recs;
+    const supportLabelTop = document.getElementById('supportLabelTop');
+    const onlineTooltipEl = document.getElementById('onlineTooltip');
 
-    // Применить язык
-    function applyLang(code) {
-      const dict = I18N[code] || I18N.ar;
+    const forecastTitleEl = document.getElementById('forecastTitle');
+    const fetchBtn        = document.getElementById('fetchBtn');
+    const historyTitleEl  = document.getElementById('historyTitle');
+
+    const faqTitleEl = document.getElementById('faqTitle');
+    const faqTextEl  = document.getElementById('faqText');
+
+    const rightsEl = document.getElementById('rightsLabel');
+
+    const mobileLangText = document.getElementById('mobileLangText');
+    const mobileSupportText = document.getElementById('mobileSupportText');
+
+    const langBackText = document.getElementById('langBackText');
+    const faqBackText  = document.getElementById('faqBackText');
+
+    const analysisLayer = document.getElementById('analysisLayer');
+    const resultLayer   = document.getElementById('resultLayer');
+    const analysisLabel = document.getElementById('analysisLabel');
+    const coefTextEl    = document.getElementById('coefText');
+
+    const successTextEl = document.getElementById('successText');
+    const tipTextEl     = document.getElementById('tipText');
+
+    // Monte Carlo elements
+    const mcTitleEl = document.getElementById('mcTitle');
+    const mcStatusEl = document.getElementById('mcStatus');
+    const mcLabelSamplesEl = document.getElementById('mcLabelSamples');
+    const mcLabelMeanEl = document.getElementById('mcLabelMean');
+    const mcLabelSigmaEl = document.getElementById('mcLabelSigma');
+    const mcLabelConfEl = document.getElementById('mcLabelConf');
+
+    const mcSamplesEl = document.getElementById('mcSamples');
+    const mcMeanEl = document.getElementById('mcMean');
+    const mcSigmaEl = document.getElementById('mcSigma');
+    const mcConfEl = document.getElementById('mcConf');
+    const mcBarEl = document.getElementById('mcBar');
+    const mcStreamEl = document.getElementById('mcStream');
+    const mcChartCanvas = document.getElementById('mcChart');
+
+    let currentLang = 'es';
+    let WAIT_BASE = I18N.es.wait;
+
+    let MC_TXT = {
+      status: I18N.es.mcStatus,
+      locking: I18N.es.mcLocking,
+      locked: I18N.es.mcLocked
+    };
+
+    let SUCCESS_LABEL = I18N.es.successLabel || 'Success rate';
+
+    // ✅ советы по диапазонам (1_2, 2_3, 3_5, 5_10, 10_20, 20_50)
+    let TIP_MAP = { '1_2': [], '2_3': [], '3_5': [], '5_10': [], '10_20': [], '20_50': [] };
+
+    // last meta to refresh on language change
+    let lastResultMeta = null;
+
+    function showAnalyzing(){
+      resultLayer.classList.add('hidden');
+      resultLayer.classList.remove('result-pulse');
+      setResultMeta(null);
+      analysisLayer.classList.remove('hidden');
+    }
+
+    function showResult(coef, meta){
+      stopMonteCarloOverlay();
+      analysisLayer.classList.add('hidden');
+
+      coefTextEl.textContent = coef;
+
+      setResultMeta(meta);
+
+      resultLayer.classList.remove('hidden');
+
+      resultLayer.classList.remove('result-pulse');
+      void resultLayer.offsetWidth;
+      resultLayer.classList.add('result-pulse');
+      setTimeout(() => resultLayer.classList.remove('result-pulse'), 950);
+    }
+
+    function hideOverlays(){
+      stopMonteCarloOverlay();
+      analysisLayer.classList.add('hidden');
+      resultLayer.classList.add('hidden');
+      resultLayer.classList.remove('result-pulse');
+      setResultMeta(null);
+    }
+
+    function applyLang(code){
+      const dict = I18N[code] || I18N.es;
+      currentLang = (I18N[code] ? code : 'es');
 
       htmlEl.lang = dict.langTag;
       htmlEl.dir  = dict.dir;
 
-      if (titleEl) titleEl.textContent = dict.title;
-      if (onlineLabel) onlineLabel.textContent = dict.online;
-      if (forecastTitleEl) forecastTitleEl.textContent = dict.forecastTitle;
-      if (forecastHintEl) forecastHintEl.textContent = dict.forecastHint;
-      if (fetchBtn) fetchBtn.textContent = dict.btnGet;
-      if (historyTitleEl) historyTitleEl.textContent = dict.historyTitle;
-      if (faqBtnLabel) faqBtnLabel.textContent = dict.faqButton;
-      if (faqTitleEl) faqTitleEl.textContent = dict.faqTitle;
-      if (faqTextEl) faqTextEl.textContent = dict.faqText;
-      if (supportLabel) supportLabel.textContent = dict.support;
+      docTitle.textContent = dict.title;
 
-      if (langBtnLabel) langBtnLabel.textContent = dict.langName;
-      if (langBtn) langBtn.setAttribute('aria-label', dict.langName);
+      langBtnLabel.textContent = dict.langName;
+      langBtn.setAttribute('aria-label', dict.langName);
 
-      WAIT_MSG = dict.wait;
-      recommendations = dict.recs;
+      langCaptionEl.textContent = dict.langCaption || 'Language';
 
-      try { localStorage.setItem('preferredLang', code); } catch(_) {}
+      supportLabelTop.textContent = dict.support || 'Support';
+      mobileSupportText.textContent = dict.support || 'Support';
+      mobileLangText.textContent = dict.langCaption || 'Language';
+
+      onlineTooltipEl.textContent = dict.usersOnline || 'Users online';
+
+      langBackText.textContent = dict.back || 'Back';
+      faqBackText.textContent  = dict.back || 'Back';
+
+      forecastTitleEl.textContent = dict.forecastTitle || '';
+
+      fetchBtn.textContent = dict.btnGet || 'Get prediction';
+      historyTitleEl.textContent = dict.historyTitle || 'History';
+
+      faqTitleEl.textContent = dict.faqTitle || 'FAQ';
+      faqTextEl.textContent  = dict.faqText || '';
+
+      rightsEl.textContent = dict.rights || '';
+
+      WAIT_BASE = dict.wait || 'Analyzing data';
+      analysisLabel.textContent = WAIT_BASE;
+
+      mcTitleEl.textContent = dict.mcTitle || 'Monte Carlo';
+      mcLabelSamplesEl.textContent = dict.mcSamples || 'Samples';
+      mcLabelMeanEl.textContent = dict.mcMean || 'Mean μ';
+      mcLabelSigmaEl.textContent = dict.mcSigma || 'Spread σ';
+      mcLabelConfEl.textContent = dict.mcCI || '95% CI';
+
+      MC_TXT = {
+        status: dict.mcStatus || 'Sampling…',
+        locking: dict.mcLocking || 'Locking…',
+        locked: dict.mcLocked || 'Locked'
+      };
+
+      SUCCESS_LABEL = dict.successLabel || 'Success rate';
+
+      TIP_MAP = {
+        '1_2': Array.isArray(dict.tips) ? dict.tips.slice() : [],
+        '2_3': Array.isArray(dict.tips_2_3) ? dict.tips_2_3.slice() : [],
+        '3_5': Array.isArray(dict.tips_3_5) ? dict.tips_3_5.slice() : [],
+        '5_10': Array.isArray(dict.tips_5_10) ? dict.tips_5_10.slice() : [],
+        '10_20': Array.isArray(dict.tips_10_20) ? dict.tips_10_20.slice() : [],
+        '20_50': Array.isArray(dict.tips_20_50) ? dict.tips_20_50.slice() : []
+      };
+
+      if (lastResultMeta){
+        setResultMeta(lastResultMeta);
+      } else {
+        setResultMeta(null);
+      }
+
+      try { localStorage.setItem('preferredLang', currentLang); } catch(_){}
     }
 
-    // ===== Языковое меню (UI)
-    (function () {
-      if (!langBtn || !langMenu) return;
+    /* ==== Онлайн-индикатор ==== */
+    const usersEl = document.getElementById('activeUsersCount');
+    const MIN_USERS = 20;
+    const MAX_USERS = 80;
+    const LS_KEY = 'pp_online_users_v1';
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+    let saved = null;
+    try { saved = parseInt(localStorage.getItem(LS_KEY), 10); } catch(_) {}
+    let currentUsers = Number.isFinite(saved) ? clamp(saved, MIN_USERS, MAX_USERS)
+      : Math.floor(MIN_USERS + Math.random() * (MAX_USERS - MIN_USERS + 1));
+    usersEl.textContent = currentUsers;
+    try { localStorage.setItem(LS_KEY, String(currentUsers)); } catch(_) {}
+    function updateUsers() {
+      const step = 1 + Math.floor(Math.random() * 3);
+      const dir  = Math.random() < 0.5 ? -1 : 1;
+      currentUsers = clamp(currentUsers + dir * step, MIN_USERS, MAX_USERS);
+      usersEl.textContent = currentUsers;
+      try { localStorage.setItem(LS_KEY, String(currentUsers)); } catch(_) {}
+    }
+    setInterval(updateUsers, 5000);
 
-      langBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = !langMenu.classList.contains('hidden');
-        langMenu.classList.toggle('hidden', isOpen);
-        langBtn.setAttribute('aria-expanded', String(!isOpen));
-      });
+    /* ===== Язык: модалка по центру ===== */
+    const langOverlay = document.getElementById('langOverlay');
+    const langOverlayBg = document.getElementById('langOverlayBg');
+    const langBackBtn = document.getElementById('langBackBtn');
+    const langModalList = document.getElementById('langModalList');
 
-      document.addEventListener('click', () => {
-        if (!langMenu.classList.contains('hidden')) {
-          langMenu.classList.add('hidden');
-          langBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
+    function openLangMenu(){
+      langOverlay.classList.remove('hidden');
+      langBtn.setAttribute('aria-expanded','true');
+    }
+    function closeLangMenu(){
+      langOverlay.classList.add('hidden');
+      langBtn.setAttribute('aria-expanded','false');
+    }
 
-      langMenu.querySelectorAll('button[data-lang]').forEach(item => {
-        item.addEventListener('click', () => {
-          const code = item.getAttribute('data-lang') || 'ar';
-          applyLang(code);
-          langMenu.classList.add('hidden');
-          langBtn.setAttribute('aria-expanded', 'false');
-        });
-      });
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = !langOverlay.classList.contains('hidden');
+      if (isOpen) closeLangMenu(); else openLangMenu();
+    });
+    langBackBtn.addEventListener('click', (e) => { e.stopPropagation(); closeLangMenu(); });
+    langOverlayBg.addEventListener('click', () => closeLangMenu());
 
-      // Инициализация языка: saved -> default 'ar'
-      (function initLang(){
-        let code = 'ar';
-        try {
-          const saved = localStorage.getItem('preferredLang');
-          if (saved && I18N[saved]) code = saved;
-        } catch(_) {}
+    langModalList.addEventListener('click', (e) => e.stopPropagation());
+    langModalList.querySelectorAll('button[data-lang]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const code = btn.getAttribute('data-lang') || 'es';
         applyLang(code);
-      })();
+        closeLangMenu();
+      });
+    });
+
+    /* ===== FAQ ===== */
+    const faqOverlay = document.getElementById('faqOverlay');
+    const faqOverlayBg = document.getElementById('faqOverlayBg');
+    const faqBackBtn = document.getElementById('faqBackBtn');
+    const faqBtnTopEl = document.getElementById('faqButtonTop');
+
+    function openFaq(){ faqOverlay.classList.remove('hidden'); }
+    function closeFaq(){ faqOverlay.classList.add('hidden'); }
+    function toggleFaq(){
+      const isOpen = !faqOverlay.classList.contains('hidden');
+      if (isOpen) closeFaq(); else openFaq();
+    }
+    faqBtnTopEl.addEventListener('click', (e) => { e.stopPropagation(); toggleFaq(); });
+    faqBackBtn.addEventListener('click', (e) => { e.stopPropagation(); closeFaq(); });
+    faqOverlayBg.addEventListener('click', () => closeFaq());
+    document.getElementById('faqPanel').addEventListener('click', (e) => e.stopPropagation());
+
+    /* ===== Mobile menu ===== */
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenuWrap = document.getElementById('mobileMenuWrap');
+    const mobileMenuBg = document.getElementById('mobileMenuBg');
+    const mobileLangBtn = document.getElementById('mobileLangBtn');
+    const mobileFaqBtn = document.getElementById('mobileFaqBtn');
+    const mobileSupportBtn = document.getElementById('mobileSupportBtn');
+
+    function openMobileMenu(){
+      mobileMenuWrap.classList.add('open');
+      mobileMenuToggle.classList.add('open');
+      mobileMenuToggle.setAttribute('aria-expanded','true');
+    }
+    function closeMobileMenu(){
+      mobileMenuWrap.classList.remove('open');
+      mobileMenuToggle.classList.remove('open');
+      mobileMenuToggle.setAttribute('aria-expanded','false');
+    }
+    function toggleMobileMenu(){
+      const isOpen = mobileMenuWrap.classList.contains('open');
+      if (isOpen) closeMobileMenu(); else openMobileMenu();
+    }
+
+    mobileMenuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleMobileMenu(); });
+    mobileMenuBg.addEventListener('click', () => closeMobileMenu());
+
+    mobileLangBtn.addEventListener('click', () => { closeMobileMenu(); openLangMenu(); });
+    mobileFaqBtn.addEventListener('click', () => { closeMobileMenu(); toggleFaq(); });
+    mobileSupportBtn.addEventListener('click', () => closeMobileMenu());
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        closeLangMenu();
+        closeFaq();
+        closeMobileMenu();
+      }
+    });
+
+    (function syncHeaderHeight(){
+      const root = document.documentElement;
+      const headerEl = document.querySelector('header');
+      if (!headerEl) return;
+      function update(){
+        const hh = headerEl.getBoundingClientRect().height;
+        root.style.setProperty('--pp-header-h', hh + 'px');
+      }
+      window.addEventListener('resize', update);
+      requestAnimationFrame(update);
+      setTimeout(update, 0);
     })();
 
-    // --------- ЛОГИКА ПРОГНОЗОВ (оставлена, тексты локализованы) ----------
-    const recommendationEl = document.getElementById('recommendation');
+    (function initLang(){
+      let code = 'es';
+      try {
+        const savedLang = localStorage.getItem('preferredLang');
+        if (savedLang && I18N[savedLang]) code = savedLang;
+      } catch(_){}
+      applyLang(code);
+    })();
+
+    /* =========================================================
+       ✅ ГРАФИК: НЕ СБРАСЫВАЕТСЯ ПРИ F5 (localStorage state)
+       + оптимизация: меньше Math.random в фоне (bitPool + rand())
+       ========================================================= */
+    (function initVideoLikeChart(){
+      const canvas = document.getElementById('chartCanvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+
+      const STORAGE_KEY = 'pp_aviator_chart_state_v2';
+      const SAVE_EVERY_MS = 2000;
+
+      function safeParse(s){
+        try { return JSON.parse(s); } catch(_) { return null; }
+      }
+      function mulberry32(a){
+        return function(){
+          let t = a += 0x6D2B79F5;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      function makeSeed(){
+        const x = (Date.now() ^ (Math.random()*1e9)) >>> 0;
+        return (x || 0xA5A5A5A5) >>> 0;
+      }
+
+      let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      let W = 0, H = 0;
+
+      const state = {
+        candles: [],
+        offsetX: 0,
+        lastT: performance.now(),
+        speed: 22,
+        step: 14,
+        w: 8,
+        base: 100,
+        seed: makeSeed(),
+        rng: null,
+        cols: 0,
+        colX: [],
+        colY: [],
+        colSpeed: [],
+        colPhase: [],
+        fontSize: 12,
+        lastRealTime: Date.now()
+      };
+      state.rng = mulberry32(state.seed);
+
+      function rand(){ return state.rng(); }
+
+      const BIT_POOL_SIZE = 2048;
+      const bitPool = new Array(BIT_POOL_SIZE);
+      for (let i=0; i<BIT_POOL_SIZE; i++) bitPool[i] = (rand() < 0.5) ? '0' : '1';
+      let bitIdx = 0;
+
+      const dotPatternCanvas = document.createElement('canvas');
+      dotPatternCanvas.width = 8;
+      dotPatternCanvas.height = 8;
+      const pctx = dotPatternCanvas.getContext('2d');
+      pctx.clearRect(0,0,8,8);
+      pctx.fillStyle = 'rgba(255,255,255,.22)';
+      pctx.fillRect(1,1,1,1);
+      pctx.fillRect(5,3,1,1);
+      pctx.fillRect(3,6,1,1);
+      let dotPattern = null;
+
+      let restored = false;
+      const savedState = safeParse((function(){ try { return localStorage.getItem(STORAGE_KEY); } catch(_) { return null; } })());
+
+      function isValidSaved(s){
+        return s && typeof s === 'object'
+          && Array.isArray(s.candles)
+          && typeof s.offsetX === 'number'
+          && typeof s.seed === 'number'
+          && typeof s.lastRealTime === 'number';
+      }
+
+      function restore(){
+        if (!isValidSaved(savedState)) return;
+        state.seed = (savedState.seed >>> 0) || makeSeed();
+        state.rng = mulberry32(state.seed);
+
+        state.candles = savedState.candles
+          .filter(c => c && typeof c.open==='number' && typeof c.close==='number' && typeof c.high==='number' && typeof c.low==='number')
+          .slice(0, 800);
+        state.offsetX = Number.isFinite(savedState.offsetX) ? savedState.offsetX : 0;
+        state.base = Number.isFinite(savedState.base) ? savedState.base : (100 + rand()*20);
+
+        if (Array.isArray(savedState.colY) && Array.isArray(savedState.colSpeed) && Array.isArray(savedState.colPhase) && Array.isArray(savedState.colX)){
+          state.colX = savedState.colX.map(n => +n).filter(Number.isFinite).slice(0, 500);
+          state.colY = savedState.colY.map(n => +n).filter(Number.isFinite).slice(0, 500);
+          state.colSpeed = savedState.colSpeed.map(n => +n).filter(Number.isFinite).slice(0, 500);
+          state.colPhase = savedState.colPhase.map(n => +n).filter(Number.isFinite).slice(0, 500);
+        }
+        state.fontSize = Number.isFinite(savedState.fontSize) ? savedState.fontSize : state.fontSize;
+
+        state.lastRealTime = Number.isFinite(savedState.lastRealTime) ? savedState.lastRealTime : Date.now();
+        restored = state.candles.length > 10;
+      }
+
+      function rndHeavy(){
+        const r = rand();
+        if (r < 0.70) return (rand() - 0.5) * 1.4;
+        if (r < 0.92) return (rand() - 0.5) * 3.2;
+        if (r < 0.985) return (rand() - 0.5) * 6.0;
+        return (rand() - 0.5) * 10.0;
+      }
+
+      function genCandle(prevClose){
+        const o = prevClose;
+        const delta = rndHeavy();
+        const c = prevClose + delta;
+
+        const wig = Math.abs(rndHeavy()) * 0.9 + 0.6;
+        const hi = Math.max(o,c) + wig * (0.7 + rand());
+        const lo = Math.min(o,c) - wig * (0.7 + rand());
+
+        return { open:o, close:c, high:hi, low:lo };
+      }
+
+      function ensureCandlesLen(need){
+        if (state.candles.length === 0){
+          state.base = 100 + rand()*20;
+          let prev = state.base;
+          for (let i=0; i<need; i++){
+            const c = genCandle(prev);
+            state.candles.push(c);
+            prev = c.close;
+          }
+          return;
+        }
+        if (state.candles.length < need){
+          let prev = state.candles[state.candles.length - 1]?.close ?? state.base;
+          while (state.candles.length < need){
+            const c = genCandle(prev);
+            state.candles.push(c);
+            prev = c.close;
+          }
+        } else if (state.candles.length > need){
+          state.candles = state.candles.slice(state.candles.length - need);
+        }
+      }
+
+      function initBinaryCols(){
+        state.fontSize = Math.max(11, Math.min(14, Math.floor(W / 30))) || 12;
+        const colW = Math.max(10, Math.floor(state.fontSize * 0.95));
+
+        const targetCols = Math.max(10, Math.floor(W / colW));
+        state.cols = targetCols;
+
+        function padOrTrim(arr, makeFn){
+          if (!Array.isArray(arr)) arr = [];
+          if (arr.length < targetCols){
+            for (let i=arr.length; i<targetCols; i++) arr.push(makeFn(i));
+          } else if (arr.length > targetCols){
+            arr = arr.slice(0, targetCols);
+          }
+          return arr;
+        }
+
+        state.colX = padOrTrim(state.colX, (i)=> i*colW + (rand()*2 - 1));
+        state.colY = padOrTrim(state.colY, (_)=> rand() * H);
+        state.colSpeed = padOrTrim(state.colSpeed, (_)=> 18 + rand() * 34);
+        state.colPhase = padOrTrim(state.colPhase, (_)=> rand() * Math.PI * 2);
+
+        for (let i=0; i<targetCols; i++){
+          state.colX[i] = i*colW + (rand()*2 - 1);
+        }
+      }
+
+      function resize(){
+        const rect = canvas.getBoundingClientRect();
+        W = Math.max(1, Math.floor(rect.width));
+        H = Math.max(1, Math.floor(rect.height));
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+        canvas.width  = Math.floor(W * dpr);
+        canvas.height = Math.floor(H * dpr);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+
+        dotPattern = ctx.createPattern(dotPatternCanvas, 'repeat');
+
+        const need = Math.ceil(W / state.step) + 12;
+
+        ensureCandlesLen(need);
+        if (!Number.isFinite(state.offsetX)) state.offsetX = 0;
+        state.offsetX = ((state.offsetX % state.step) + state.step) % state.step;
+        state.offsetX = -state.offsetX;
+
+        initBinaryCols();
+      }
+
+      function drawPanel(){
+        const g = ctx.createLinearGradient(0,0,0,H);
+        g.addColorStop(0, 'rgba(2,6,23,.92)');
+        g.addColorStop(1, 'rgba(1,15,9,.92)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,W,H);
+      }
+
+      function drawBinaryBackground(dt){
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+
+        const font = `${state.fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+        ctx.font = font;
+        ctx.textBaseline = 'top';
+
+        const tailLen = 9;
+        const lineH = Math.floor(state.fontSize * 1.12);
+
+        for (let i=0; i<state.cols; i++){
+          state.colY[i] += state.colSpeed[i] * dt;
+          state.colPhase[i] += dt * (0.9 + (rand()*0.4));
+          const xJit = Math.sin(state.colPhase[i]) * 0.6;
+
+          if (state.colY[i] > H + tailLen * lineH){
+            state.colY[i] = -rand() * H * 0.35;
+            state.colSpeed[i] = 18 + rand() * 34;
+          }
+
+          const x = state.colX[i] + xJit;
+          const headY = state.colY[i];
+
+          for (let t=0; t<tailLen; t++){
+            const y = headY - t * lineH;
+            if (y < -lineH || y > H) continue;
+
+            bitIdx = (bitIdx + 1) & (BIT_POOL_SIZE - 1);
+            const bit = bitPool[bitIdx];
+
+            const a = Math.max(0, 0.55 - t * 0.055);
+            const glow = Math.max(0, 0.38 - t * 0.04);
+
+            ctx.save();
+            ctx.globalAlpha = a;
+
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = `rgba(34,197,94,${glow})`;
+            ctx.fillStyle = `rgba(34,197,94,${a})`;
+            ctx.fillText(bit, x, y);
+
+            if (t === 0 && rand() < 0.35){
+              ctx.globalAlpha = 0.22;
+              ctx.shadowBlur = 10;
+              ctx.shadowColor = 'rgba(255,255,255,.25)';
+              ctx.fillStyle = 'rgba(255,255,255,.22)';
+              ctx.fillText(bit, x + 0.2, y);
+            }
+            ctx.restore();
+          }
+        }
+
+        ctx.restore();
+
+        ctx.save();
+        const fade = ctx.createLinearGradient(0,0,0,H);
+        fade.addColorStop(0, 'rgba(0,0,0,.35)');
+        fade.addColorStop(0.35, 'rgba(0,0,0,.10)');
+        fade.addColorStop(1, 'rgba(0,0,0,.22)');
+        ctx.fillStyle = fade;
+        ctx.fillRect(0,0,W,H);
+        ctx.restore();
+      }
+
+      function drawPerspectiveGrid(){
+        ctx.save();
+        ctx.globalAlpha = 0.32;
+
+        const slope = -0.20;
+        const spacing = Math.max(22, Math.floor(H/11));
+        ctx.lineWidth = 1;
+
+        for (let y = -H; y < H*2; y += spacing){
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(34,197,94,.28)';
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y + W*slope);
+          ctx.stroke();
+        }
+
+        const vSpacing = Math.max(28, Math.floor(W/9));
+        for (let x = -W; x < W*2; x += vSpacing){
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(34,197,94,.18)';
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x + H*0.35, H);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 0.48;
+        ctx.strokeStyle = 'rgba(34,197,94,.45)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(0, H*0.25);
+        ctx.lineTo(W, H*0.25 + W*slope);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, H*0.55);
+        ctx.lineTo(W, H*0.55 + W*slope);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawCandles(){
+        const topPad = 14;
+        const midSplit = Math.floor(H * 0.62);
+        const bottomTop = midSplit + 8;
+
+        let minV = Infinity, maxV = -Infinity;
+        for (const c of state.candles){
+          minV = Math.min(minV, c.low);
+          maxV = Math.max(maxV, c.high);
+        }
+        const pad = (maxV - minV) * 0.12 + 0.8;
+        minV -= pad; maxV += pad;
+
+        function yFor(v){
+          const t = (v - minV) / (maxV - minV + 1e-9);
+          return topPad + (1 - t) * (midSplit - topPad);
+        }
+
+        for (let i=0; i<state.candles.length; i++){
+          const c = state.candles[i];
+          const x = state.offsetX + i * state.step;
+          if (x < -state.step || x > W + state.step) continue;
+
+          const up = c.close >= c.open;
+          const wickCol = up ? 'rgba(34,197,94,.95)' : 'rgba(239,68,68,.95)';
+          const bodyCol = up ? 'rgba(34,197,94,.85)' : 'rgba(239,68,68,.85)';
+
+          const yO = yFor(c.open);
+          const yC = yFor(c.close);
+          const yH = yFor(c.high);
+          const yL = yFor(c.low);
+
+          ctx.save();
+          ctx.shadowBlur = 14;
+          ctx.shadowColor = up ? 'rgba(34,197,94,.45)' : 'rgba(239,68,68,.45)';
+          ctx.strokeStyle = wickCol;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(x + state.w/2, yH);
+          ctx.lineTo(x + state.w/2, yL);
+          ctx.stroke();
+          ctx.restore();
+
+          const bodyTop = Math.min(yO, yC);
+          const bodyH = Math.max(3, Math.abs(yO - yC));
+          ctx.save();
+          ctx.fillStyle = bodyCol;
+          ctx.globalAlpha = 0.95;
+          ctx.fillRect(x, bodyTop, state.w, bodyH);
+
+          if (dotPattern){
+            ctx.globalAlpha = 0.55;
+            ctx.fillStyle = dotPattern;
+            ctx.fillRect(x, bodyTop, state.w, bodyH);
+          }
+
+          ctx.globalAlpha = 0.75;
+          ctx.strokeStyle = up ? 'rgba(255,255,255,.22)' : 'rgba(255,255,255,.18)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x + 0.5, bodyTop + 0.5, state.w - 1, bodyH - 1);
+          ctx.restore();
+        }
+
+        ctx.save();
+        ctx.globalAlpha = 0.55;
+        ctx.strokeStyle = 'rgba(34,197,94,.40)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, bottomTop);
+        ctx.lineTo(W, bottomTop);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawLowerLine(){
+        const midSplit = Math.floor(H * 0.62);
+        const baseY = midSplit + 10;
+        const lowH = H - baseY;
+
+        const closes = state.candles.map(c => c.close);
+
+        let minV = Math.min(...closes);
+        let maxV = Math.max(...closes);
+        const pad = (maxV - minV) * 0.18 + 0.8;
+        minV -= pad; maxV += pad;
+
+        function yFor(v){
+          const t = (v - minV) / (maxV - minV + 1e-9);
+          return baseY + (1 - t) * (lowH - 14);
+        }
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,.22)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2,6]);
+        ctx.beginPath();
+        for (let i=0; i<closes.length; i++){
+          const x = state.offsetX + i * state.step + state.w/2;
+          const y = yFor(closes[i]);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = 'rgba(34,197,94,.40)';
+        ctx.strokeStyle = 'rgba(34,197,94,.95)';
+        ctx.lineWidth = 3.2;
+        ctx.lineJoin = 'miter';
+        ctx.lineCap  = 'butt';
+        ctx.beginPath();
+        for (let i=0; i<closes.length; i++){
+          const x = state.offsetX + i * state.step + state.w/2;
+          const y = yFor(closes[i]);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function fastForwardByElapsed(elapsedMs){
+        const MAX_CATCHUP_MS = 30 * 60 * 1000;
+        const ms = Math.max(0, Math.min(MAX_CATCHUP_MS, elapsedMs));
+        const elapsedSec = ms / 1000;
+
+        state.offsetX -= state.speed * elapsedSec;
+
+        let shifts = Math.floor((-state.offsetX) / state.step);
+        if (shifts > 2400) shifts = 2400;
+
+        if (shifts > 0){
+          state.offsetX += shifts * state.step;
+
+          for (let i=0; i<shifts; i++){
+            const prev = state.candles[state.candles.length - 1]?.close ?? state.base;
+            state.candles.shift();
+            state.candles.push(genCandle(prev));
+          }
+        }
+
+        for (let i=0; i<state.cols; i++){
+          state.colY[i] += state.colSpeed[i] * elapsedSec;
+        }
+
+        while (state.offsetX <= -state.step) state.offsetX += state.step;
+      }
+
+      function saveStateNow(){
+        const payload = {
+          seed: state.seed >>> 0,
+          offsetX: state.offsetX,
+          base: state.base,
+          candles: state.candles.slice(-400),
+          colX: state.colX.slice(0, 240),
+          colY: state.colY.slice(0, 240),
+          colSpeed: state.colSpeed.slice(0, 240),
+          colPhase: state.colPhase.slice(0, 240),
+          fontSize: state.fontSize,
+          lastRealTime: Date.now()
+        };
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(_){}
+      }
+
+      function tick(t){
+        const dt = Math.min(0.06, (t - state.lastT) / 1000);
+        state.lastT = t;
+
+        state.offsetX -= state.speed * dt;
+        while (state.offsetX <= -state.step){
+          state.offsetX += state.step;
+          const prev = state.candles[state.candles.length - 1]?.close ?? state.base;
+          state.candles.shift();
+          state.candles.push(genCandle(prev));
+        }
+
+        ctx.clearRect(0,0,W,H);
+
+        drawPanel();
+        drawBinaryBackground(dt);
+        drawPerspectiveGrid();
+        drawCandles();
+        drawLowerLine();
+
+        requestAnimationFrame(tick);
+      }
+
+      restore();
+      resize();
+
+      if (restored){
+        const now = Date.now();
+        const elapsed = now - state.lastRealTime;
+        fastForwardByElapsed(elapsed);
+      } else {
+        saveStateNow();
+      }
+
+      window.addEventListener('resize', resize);
+
+      setInterval(saveStateNow, SAVE_EVERY_MS);
+      window.addEventListener('beforeunload', saveStateNow);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') saveStateNow();
+      });
+
+      requestAnimationFrame(tick);
+    })();
+
+    (function chartGlowParallax(){
+      const box = document.getElementById('forecastWindow');
+      const glow = document.getElementById('chartRightGlow');
+      if (!box || !glow) return;
+
+      function move(x, y){
+        const r = box.getBoundingClientRect();
+        const px = (x - r.left) / Math.max(1, r.width);
+        const py = (y - r.top) / Math.max(1, r.height);
+        const tx = (px - 0.5) * 10;
+        const ty = (py - 0.5) * 6;
+        glow.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        glow.style.opacity = String(0.55 + px * 0.25);
+      }
+
+      box.addEventListener('mousemove', (e)=> move(e.clientX, e.clientY));
+      box.addEventListener('touchmove', (e)=>{
+        const t = e.touches && e.touches[0];
+        if (t) move(t.clientX, t.clientY);
+      }, {passive:true});
+
+      box.addEventListener('mouseleave', ()=>{
+        glow.style.transform = 'translate3d(0,0,0)';
+        glow.style.opacity = '';
+      });
+    })();
+
+    // --------- ЛОГИКА ПРОГНОЗОВ ----------
     const historyContainer = document.getElementById('historyContainer');
     const historyList = document.getElementById('historyList');
     const MAX_HISTORY = 10;
     let history = [];
+    let isBusy = false;
 
+    const HIST_KEY = 'pp_aviator_history_v1';
+    function saveHistory(){
+      try { localStorage.setItem(HIST_KEY, JSON.stringify(history)); } catch(_){}
+    }
+    function loadHistory(){
+      try {
+        const s = localStorage.getItem(HIST_KEY);
+        const arr = JSON.parse(s || '[]');
+        if (Array.isArray(arr)) history = arr.slice(0, MAX_HISTORY);
+      } catch(_){}
+    }
+    function renderHistory(){
+      historyList.innerHTML = '';
+      history.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        li.className = 'lgx-chip px-4 py-2 text-sm text-gray-900 dark:text-white';
+        historyList.appendChild(li);
+      });
+      if (history.length) historyContainer.classList.remove('hidden');
+    }
+    loadHistory();
+    renderHistory();
+
+    function hardBlur(btn){
+      try { btn.blur(); } catch(_){}
+      requestAnimationFrame(() => { try { btn.blur(); } catch(_){} });
+      setTimeout(() => { try { btn.blur(); } catch(_){} }, 0);
+    }
+    fetchBtn.addEventListener('pointerdown', () => hardBlur(fetchBtn));
+    fetchBtn.addEventListener('mousedown',   () => hardBlur(fetchBtn));
+    fetchBtn.addEventListener('touchstart',  () => hardBlur(fetchBtn), {passive:true});
+
+    function genCoefValue(){
+      const r = Math.random();
+      let low, high;
+      if (r < 0.72)       { low = 1;  high = 2;  }
+      else if (r < 0.945) { low = 2;  high = 3;  }
+      else if (r < 0.99)  { low = 3;  high = 5;  }
+      else if (r < 0.997) { low = 5;  high = 10; }
+      else if (r < 0.9993){ low = 10; high = 20; }
+      else                { low = 20; high = 50; }
+      const v = (Math.random() * (high - low) + low);
+      return Math.round(v * 100) / 100;
+    }
+    function formatCoef(v){
+      return `> ${v.toFixed(2)}×`;
+    }
+
+    /* =========================================================
+       ✅ ПРОЦЕНТ УСПЕХА ДЛЯ ВСЕХ ДИАПАЗОНОВ 1.00×–50.00×
+       1.00–2.00  => 85.3–96.8
+       2.01–3.00  => 60.3–85.2
+       3.01–5.00  => 40.3–60.2
+       5.01–10.00 => 30.3–40.2
+       10.01–20.00=> 20.3–30.2
+       20.01–50.00=> 10.3–20.2
+       ========================================================= */
+    function randRange1Dec(a, b){
+      const p = a + Math.random() * (b - a);
+      return Math.round(p * 10) / 10; // 1 знак
+    }
+
+    function getSuccessRange(val){
+      if (val >= 1.00 && val <= 2.00) return { key:'1_2',   min:85.3, max:96.8 };
+      if (val >  2.00 && val <= 3.00) return { key:'2_3',   min:60.3, max:85.2 };
+      if (val >  3.00 && val <= 5.00) return { key:'3_5',   min:40.3, max:60.2 };
+      if (val >  5.00 && val <= 10.00) return { key:'5_10', min:30.3, max:40.2 };
+      if (val > 10.00 && val <= 20.00) return { key:'10_20',min:20.3, max:30.2 };
+      if (val > 20.00 && val <= 50.00) return { key:'20_50',min:10.3, max:20.2 };
+      return null;
+    }
+
+    function buildResultMeta(val){
+      const r = getSuccessRange(val);
+      if (!r) return null;
+
+      const p = randRange1Dec(r.min, r.max);
+
+      const list = (TIP_MAP && TIP_MAP[r.key]) ? TIP_MAP[r.key] : [];
+      const tipIdx = list.length ? Math.floor(Math.random() * list.length) : null;
+
+      return { p, tipIdx, rangeKey: r.key };
+    }
+
+    function setResultMeta(meta){
+      lastResultMeta = meta;
+
+      if (!successTextEl || !tipTextEl) return;
+
+      if (!meta){
+        successTextEl.textContent = '';
+        tipTextEl.textContent = '';
+        successTextEl.classList.add('hidden');
+        tipTextEl.classList.add('hidden');
+        return;
+      }
+
+      // ✅ percent always
+      successTextEl.classList.remove('hidden');
+      const pTxt = meta.p.toFixed(1);
+      successTextEl.textContent = `${SUCCESS_LABEL} ${pTxt}%`;
+
+      // ✅ tip by rangeKey, if available
+      const list = (TIP_MAP && TIP_MAP[meta.rangeKey]) ? TIP_MAP[meta.rangeKey] : [];
+      if (!list.length || meta.tipIdx === null || meta.tipIdx === undefined){
+        tipTextEl.textContent = '';
+        tipTextEl.classList.add('hidden');
+      } else {
+        tipTextEl.classList.remove('hidden');
+        tipTextEl.textContent = list[(meta.tipIdx || 0) % list.length] || '';
+      }
+    }
+
+    /* =========================================================
+       ✅ VAR 1 JS: Monte Carlo overlay (сходимость)
+       ========================================================= */
+    const MC = {
+      running: false,
+      raf: 0,
+      timer: 0,
+      start: 0,
+      dur: 0,
+      lockAt: 0,
+      target: 0,
+      n: 0,
+      mean: 0,
+      m2: 0,
+      dMean: 0,
+      dSigma: 0,
+      dConf: 0,
+      pts: [],
+      ctx: null,
+      dpr: 1,
+      cw: 0,
+      ch: 0,
+      lines: [],
+      streamTick: 0
+    };
+
+    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function fmtInt(n){
+      const s = Math.floor(n).toString();
+      return s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+
+    function heavyNoise(scale){
+      const r = Math.random();
+      let z = (Math.random() - 0.5) * 2;
+      if (r < 0.70) z *= 0.8;
+      else if (r < 0.92) z *= 2.2;
+      else if (r < 0.985) z *= 4.0;
+      else z *= 7.0;
+      return z * scale;
+    }
+
+    function mcResize(){
+      if (!mcChartCanvas) return;
+      const rect = mcChartCanvas.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+      MC.dpr = dpr;
+      MC.cw = w;
+      MC.ch = h;
+
+      mcChartCanvas.width = Math.floor(w * dpr);
+      mcChartCanvas.height = Math.floor(h * dpr);
+      mcChartCanvas.style.width = w + 'px';
+      mcChartCanvas.style.height = h + 'px';
+
+      const ctx = mcChartCanvas.getContext('2d', { alpha: true, desynchronized: true });
+      MC.ctx = ctx;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+
+    function mcReset(){
+      MC.n = 0;
+      MC.mean = 0;
+      MC.m2 = 0;
+      MC.pts = [];
+      MC.lines = [];
+      MC.streamTick = 0;
+
+      MC.dMean = MC.target + (Math.random() - 0.5) * 0.8;
+      MC.dSigma = 1.2;
+      MC.dConf = 1.0;
+
+      mcSamplesEl.textContent = '—';
+      mcMeanEl.textContent = '—';
+      mcSigmaEl.textContent = '—';
+      mcConfEl.textContent = '—';
+      mcBarEl.style.width = '0%';
+      mcStreamEl.textContent = '—';
+      mcStatusEl.textContent = MC_TXT.status;
+    }
+
+    function mcAddSample(x){
+      MC.n += 1;
+      const delta = x - MC.mean;
+      MC.mean += delta / MC.n;
+      const delta2 = x - MC.mean;
+      MC.m2 += delta * delta2;
+    }
+
+    function mcSigma(){
+      if (MC.n < 2) return 0;
+      return Math.sqrt(MC.m2 / (MC.n - 1));
+    }
+
+    function mcDrawChart(){
+      const ctx = MC.ctx;
+      if (!ctx) return;
+
+      const W = MC.cw, H = MC.ch;
+      ctx.clearRect(0,0,W,H);
+
+      const g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0, 'rgba(0,0,0,.25)');
+      g.addColorStop(1, 'rgba(0,0,0,.08)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,W,H);
+
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = 'rgba(34,197,94,.18)';
+      ctx.lineWidth = 1;
+      const gx = Math.max(24, Math.floor(W/6));
+      const gy = Math.max(18, Math.floor(H/4));
+      for (let x=0; x<=W; x+=gx){
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+      }
+      for (let y=0; y<=H; y+=gy){
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+      }
+      ctx.restore();
+
+      const pts = MC.pts;
+      if (!pts.length) return;
+
+      let minY = Infinity, maxY = -Infinity;
+      for (const p of pts){
+        minY = Math.min(minY, p.m - p.c*1.1);
+        maxY = Math.max(maxY, p.m + p.c*1.1);
+      }
+      minY = Math.min(minY, MC.target - 0.6);
+      maxY = Math.max(maxY, MC.target + 0.6);
+      const pad = (maxY - minY) * 0.18 + 0.01;
+      minY -= pad; maxY += pad;
+
+      function yFor(v){
+        const t = (v - minY) / (maxY - minY + 1e-9);
+        return (1 - t) * (H - 14) + 7;
+      }
+
+      ctx.save();
+      ctx.setLineDash([3,6]);
+      ctx.strokeStyle = 'rgba(255,255,255,.22)';
+      ctx.lineWidth = 1;
+      const yt = yFor(MC.target);
+      ctx.beginPath(); ctx.moveTo(0, yt); ctx.lineTo(W, yt); ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(34,197,94,.18)';
+      ctx.beginPath();
+      for (let i=0; i<pts.length; i++){
+        const x = (i/(pts.length-1)) * W;
+        ctx.lineTo(x, yFor(pts[i].m + pts[i].c));
+      }
+      for (let i=pts.length-1; i>=0; i--){
+        const x = (i/(pts.length-1)) * W;
+        ctx.lineTo(x, yFor(pts[i].m - pts[i].c));
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = 'rgba(34,197,94,.30)';
+      ctx.strokeStyle = 'rgba(34,197,94,.95)';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      for (let i=0; i<pts.length; i++){
+        const x = (i/(pts.length-1)) * W;
+        const y = yFor(pts[i].m);
+        if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      const last = pts[pts.length-1];
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,.28)';
+      ctx.beginPath();
+      ctx.arc(W - 8, yFor(last.m), 3.6, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(34,197,94,.95)';
+      ctx.beginPath();
+      ctx.arc(W - 8, yFor(last.m), 2.2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function mcUpdateStream(p){
+      const n = MC.n || 0;
+      const mu = MC.dMean || 0;
+      const sg = MC.dSigma || 0;
+
+      const baseIdx = Math.max(0, n - 4000);
+      const lines = [];
+      const cool = (1 - p);
+      const scale = lerp(1.6, 0.18, easeOutCubic(p));
+
+      for (let i=0; i<5; i++){
+        const idx = baseIdx + Math.floor(Math.random() * 4000);
+        const x = clamp( (MC.target + heavyNoise(scale)), 1.0, 50.0 ).toFixed(2);
+        const w = (Math.random()*0.98 + 0.02).toFixed(3);
+        const err = Math.abs(parseFloat(x) - mu).toFixed(2);
+        lines.push(`mc[${idx.toString().padStart(6,'0')}]  x=${x}  w=${w}  err=${err}`);
+      }
+
+      const score = (Math.max(0, 1 - sg*0.25) * 100).toFixed(1);
+      const band = MC.dConf.toFixed(2);
+
+      lines.push(`μ=${mu.toFixed(2)}  σ=${sg.toFixed(2)}  CI95=±${band}  score=${score}%`);
+      lines.push(`reduce(var)=${(1 - cool).toFixed(3)}  stabilize=on  seed=${(Math.floor(MC.target*1000)%9973).toString().padStart(4,'0')}`);
+
+      mcStreamEl.textContent = lines.join('\n');
+    }
+
+    function stopMonteCarloOverlay(){
+      if (!MC.running) return;
+      MC.running = false;
+      try { cancelAnimationFrame(MC.raf); } catch(_){}
+      try { clearInterval(MC.timer); } catch(_){}
+      MC.raf = 0;
+      MC.timer = 0;
+      window.removeEventListener('resize', mcResize);
+    }
+
+    function startMonteCarloOverlay(durationMs, target){
+      stopMonteCarloOverlay();
+
+      MC.running = true;
+      MC.start = performance.now();
+      MC.dur = Math.max(1200, durationMs || 5200);
+      MC.lockAt = MC.start + MC.dur * 0.78;
+      MC.target = target;
+
+      mcResize();
+      mcReset();
+
+      window.addEventListener('resize', mcResize);
+
+      MC.timer = setInterval(() => {
+        if (!MC.running) return;
+        const now = performance.now();
+        const p = clamp01((now - MC.start) / MC.dur);
+        mcUpdateStream(p);
+      }, 90);
+
+      function frame(){
+        if (!MC.running) return;
+
+        const now = performance.now();
+        const t = clamp01((now - MC.start) / MC.dur);
+        const p = easeOutCubic(t);
+
+        if (now < MC.lockAt) mcStatusEl.textContent = MC_TXT.status;
+        else if (t < 0.94) mcStatusEl.textContent = MC_TXT.locking;
+        else mcStatusEl.textContent = MC_TXT.locked;
+
+        mcBarEl.style.width = (t * 100).toFixed(1) + '%';
+
+        const batch = Math.floor(lerp(260, 90, p) + Math.random()*40);
+        const noiseScale = lerp(1.8, 0.14, p);
+
+        for (let i=0; i<batch; i++){
+          const x = clamp(MC.target + heavyNoise(noiseScale), 1.0, 50.0);
+          mcAddSample(x);
+        }
+
+        const sigma = mcSigma();
+        const conf = (MC.n > 10) ? (1.96 * sigma / Math.sqrt(MC.n)) : (sigma || 0);
+
+        const sMean = (MC.n > 0) ? MC.mean : MC.target;
+        MC.dMean = lerp(MC.dMean, sMean, 0.10 + p*0.08);
+        MC.dSigma = lerp(MC.dSigma, sigma, 0.10);
+        MC.dConf = lerp(MC.dConf, conf, 0.12);
+
+        mcSamplesEl.textContent = fmtInt(MC.n);
+        mcMeanEl.textContent = MC.dMean.toFixed(2);
+        mcSigmaEl.textContent = MC.dSigma.toFixed(2);
+        mcConfEl.textContent = '±' + MC.dConf.toFixed(2);
+
+        MC.pts.push({ m: MC.dMean, c: Math.max(0.03, MC.dConf) });
+        if (MC.pts.length > 120) MC.pts.shift();
+
+        mcDrawChart();
+
+        MC.raf = requestAnimationFrame(frame);
+      }
+
+      MC.raf = requestAnimationFrame(frame);
+    }
+
+    /* =======================
+       КЛИК: выдача прогноза
+       ======================= */
     fetchBtn.addEventListener('click', () => {
+      hardBlur(fetchBtn);
+      if (isBusy) return;
+      isBusy = true;
+
       fetchBtn.disabled = true;
-      fetchBtn.classList.add('opacity-50', 'cursor-not-allowed');
-      forecastHintEl.textContent = WAIT_MSG;
-      recommendationEl.textContent = '';
+      hideOverlays();
+      showAnalyzing();
+
+      if (navigator.vibrate) navigator.vibrate(18);
+
+      const cores = navigator.hardwareConcurrency || 4;
+      const mem = navigator.deviceMemory || 4;
+      const ANALYZE_MS = Math.round(
+        Math.max(3600, Math.min(6200, 4200 + (cores - 4) * 250 + (mem - 4) * 180))
+      );
+
+      const targetVal = genCoefValue();
+      startMonteCarloOverlay(ANALYZE_MS, targetVal);
 
       setTimeout(() => {
-        const r = Math.random();
-        let low, high;
-        if (r < 0.72) {
-          low = 1; high = 2;
-        } else if (r < 0.945) {
-          low = 2; high = 3;
-        } else if (r < 0.995) {
-          low = 3; high = 5;
-        } else if (r < 1.015) {
-          low = 5; high = 10;
-        } else if (r < 1.0199) {
-          low = 10; high = 20;
-        } else {
-          low = 20; high = 50;
-        }
-        const coefValue = (Math.random() * (high - low) + low).toFixed(2);
-        const coef = `> ${coefValue}×`;
-        forecastHintEl.textContent = coef;
+        const coef = formatCoef(targetVal);
 
-        const rec = recommendations[Math.floor(Math.random() * recommendations.length)];
-        recommendationEl.textContent = rec;
+        if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+
+        const meta = buildResultMeta(targetVal);
+        showResult(coef, meta);
 
         history.unshift(coef);
         if (history.length > MAX_HISTORY) history.pop();
-        historyList.innerHTML = '';
-        history.forEach(item => {
-          const li = document.createElement('li');
-          li.textContent = item;
-          li.className = 'px-4 py-1 bg-gray-200 dark:bg-gray-700 rounded';
-          historyList.appendChild(li);
-        });
-        historyContainer.classList.remove('hidden');
+
+        saveHistory();
+        renderHistory();
 
         fetchBtn.disabled = false;
-        fetchBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-      }, 3000);
+        isBusy = false;
+        hardBlur(fetchBtn);
+      }, ANALYZE_MS);
     });
-    // -------------------------------------------------
   </script>
 </body>
 </html>
