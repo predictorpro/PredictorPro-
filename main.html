@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es-PE" class="dark">
 <head>
   <meta charset="utf-8"/>
@@ -6,133 +6,739 @@
   <title id="docTitle">PredictorPro – Página principal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Activar tema oscuro por clase
     tailwind.config = { darkMode: 'class' };
   </script>
+
   <style>
-  /* Переносим фон с body на фиксированный слой, чтобы он не «ездил» на мобилках */
-  body.diamond-bg{
-    background: none !important; /* отключаем прежний фон у body */
-    position: relative;          /* базовый контекст для псевдо-элемента */
-  }
+    /* ===== Фон страницы (паттерн), поверх — liquid glass (как Apple of Fortune) ===== */
+    body.diamond-bg{ background: none !important; position: relative; }
+    body.diamond-bg::before{
+      content:""; position: fixed; inset:0; z-index:-1; pointer-events:none;
+      background-color:#fff;
+      background-image:
+        linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 65%),
+        repeating-linear-gradient(45deg, rgba(22,163,74,.12) 0 12px, rgba(22,163,74,0) 12px 24px),
+        repeating-linear-gradient(-45deg, rgba(22,163,74,.12) 0 12px, rgba(22,163,74,0) 12px 24px),
+        linear-gradient(to bottom, #ecfdf5, #d1fae5);
+      background-size:auto,40px 40px,40px 40px,auto;
+      background-position: top left, center, center, center;
+    }
+    .dark body.diamond-bg::before{
+      background-color:#000;
+      background-image:
+        linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0) 65%),
+        repeating-linear-gradient(45deg, rgba(22,163,74,.2) 0 12px, rgba(22,163,74,0) 12px 24px),
+        repeating-linear-gradient(-45deg, rgba(22,163,74,.2) 0 12px, rgba(22,163,74,0) 12px 24px),
+        linear-gradient(to bottom, #052e16, #065f46);
+      background-size:auto,40px 40px,40px 40px,auto;
+      background-position: top left, center, center, center;
+    }
 
-  /* Фон (светлая тема) — фиксированный слой позади контента */
-  body.diamond-bg::before{
-    content:"";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    /* те же слои, что были у светлой темы */
-    background-color:#fff; /* fallback claro */
-    background-image:
-      linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 65%),
-      repeating-linear-gradient(45deg, rgba(22,163,74,.15) 0 12px, rgba(22,163,74,0) 12px 24px),
-      repeating-linear-gradient(-45deg, rgba(22,163,74,.15) 0 12px, rgba(22,163,74,0) 12px 24px),
-      linear-gradient(to bottom, #ecfdf5, #d1fae5);
-    background-size: auto, 40px 40px, 40px 40px, auto;
-    background-position: top left, center, center, center;
-  }
+    /* ======= Apple Liquid Glass — базовые утилиты ======= */
+    .lgx-blur{ backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .lgx-sheen{ position:relative; overflow:hidden; }
+    .lgx-sheen::before{
+      content:""; position:absolute; left:-30%; top:-40%; width:160%; height:160%;
+      background: radial-gradient(140px 180px at 25% 30%, rgba(255,255,255,.35), transparent 60%);
+      filter: blur(12px); pointer-events: none; mix-blend-mode: screen;
+    }
+    @media (max-width: 640px){
+      .lgx-sheen::before{
+        left:-35%; top:-45%; width:170%; height:170%;
+        background: radial-gradient(120px 150px at 28% 28%, rgba(255,255,255,.32), transparent 62%);
+      }
+    }
+    .lgx-card{
+      border-radius: 1rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.08));
+      border: 1px solid rgba(34,197,94,.45);
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(255,255,255,.12);
+    }
+    .dark .lgx-card{
+      background: linear-gradient(135deg, rgba(0,0,0,.38), rgba(0,0,0,.2));
+      border-color: rgba(34,197,94,.55);
+    }
+    .lgx-chip{
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,255,255,.08));
+      border: 1px solid rgba(34,197,94,.5);
+      box-shadow:
+        0 8px 24px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.25),
+        inset 0 -1px 0 rgba(255,255,255,.12);
+    }
+    .dark .lgx-chip{
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
+      border-color: rgba(34,197,94,.55);
+    }
 
-  /* Фон (тёмная тема) — тот же слой, но с тёмными градиентами */
-  .dark body.diamond-bg::before{
-    background-color:#000; /* fallback oscuro */
-    background-image:
-      linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0) 65%),
-      repeating-linear-gradient(45deg, rgba(22,163,74,.25) 0 12px, rgba(22,163,74,0) 12px 24px),
-      repeating-linear-gradient(-45deg, rgba(22,163,74,.25) 0 12px, rgba(22,163,74,0) 12px 24px),
-      linear-gradient(to bottom, #052e16, #065f46);
-    background-size: auto, 40px 40px, 40px 40px, auto;
-    background-position: top left, center, center, center;
-  }
-</style>
+    .lgx-btn{
+      border-radius: 1rem; font-weight: 600;
+      background: linear-gradient(135deg, rgba(34,197,94,.28), rgba(34,197,94,.12));
+      border: 1px solid rgba(34,197,94,.55);
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.25),
+        inset 0 -1px 0 rgba(255,255,255,.12);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      touch-action: manipulation;
+      transform: translate3d(0,0,0);
+    }
+    .lgx-btn:hover{ transform: translate3d(0,-1px,0); border-color: rgba(34,197,94,.7); }
+    .lgx-btn:active{ transform: translate3d(0,0,0); }
+    .lgx-btn.solid{ background: linear-gradient(135deg, rgba(16,185,129,.40), rgba(16,185,129,.18)); }
 
+    .lgx-nav{
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      border-bottom: 1px solid rgba(34,197,94,.4);
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+    }
+    .dark .lgx-nav{
+      background: linear-gradient(135deg, rgba(0,0,0,.5), rgba(0,0,0,.28));
+      border-color: rgba(34,197,94,.5);
+    }
+
+    /* ======= НОВЫЙ ДИЗАЙН КНОПОК ВЕРХНЕГО БАРА (как AOF) ======= */
+    .nav-badge{
+      border-radius: 9999px;
+      padding: .45rem .65rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      border: 1px solid rgba(34,197,94,.40);
+      box-shadow:
+        0 8px 22px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.22);
+      transition: transform .18s ease;
+      transform: translate3d(0,0,0);
+    }
+    .dark .nav-badge{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.24));
+      border-color: rgba(34,197,94,.5);
+    }
+    .nav-badge:hover{ transform: translate3d(0,-1px,0); }
+
+    /* ===== ONLINE WAVES + GLASS INDICATOR + TOOLTIP (как AOF) ===== */
+    .online-pill{
+      border: 0 !important;
+      padding: .30rem .55rem !important;
+      gap: .45rem !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,.10)) !important;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(255,255,255,.10) !important;
+      position: relative;
+      overflow: hidden;
+      height: 2.25rem;
+      display: inline-flex;
+      align-items: center;
+      width: auto;
+    }
+    .online-pill::before{
+      content:""; position:absolute; left:-35%; top:-55%; width:170%; height:170%;
+      background: radial-gradient(140px 180px at 28% 28%, rgba(255,255,255,.30), transparent 62%);
+      filter: blur(12px);
+      pointer-events:none;
+      mix-blend-mode: screen;
+      opacity: .9;
+    }
+    .dark .online-pill{
+      background: linear-gradient(135deg, rgba(0,0,0,.48), rgba(0,0,0,.28)) !important;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.12),
+        inset 0 -1px 0 rgba(255,255,255,.06) !important;
+    }
+    .dark .online-pill::before{ opacity: .55; }
+
+    .online-dot{
+      position: relative; width: .75rem; height: .75rem; border-radius: 9999px;
+      background: radial-gradient(circle at 40% 40%, #22c55e, #16a34a);
+      box-shadow: 0 0 10px rgba(34,197,94,.7);
+      flex: 0 0 auto;
+    }
+    .online-dot::after{
+      content:""; position:absolute; inset: -6px;
+      border-radius: 9999px; border: 2px solid rgba(34,197,94,.45);
+      animation: online-pulse 1.6s infinite ease-out;
+    }
+    @keyframes online-pulse{
+      0%{ transform: scale(.6); opacity:.8; }
+      70%{ transform: scale(1.25); opacity:0; }
+      100%{ transform: scale(1.25); opacity:0; }
+    }
+
+    .online-signal{
+      --cx: 50%;
+      --cy: 50%;
+      position: relative;
+      width: 1.65rem;
+      height: 1.65rem;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+    .online-signal .wave{
+      position:absolute;
+      left: var(--cx);
+      top: var(--cy);
+      width: .28rem;
+      height: .28rem;
+      border-radius: 9999px;
+      border: 2px solid rgba(34,197,94,.40);
+      transform: translate(-50%,-50%) scale(.25);
+      opacity: 0;
+      animation: wave-out 1.6s infinite ease-out;
+      pointer-events: none;
+    }
+    .online-signal .wave2{ animation-delay: .53s; opacity:0; }
+    .online-signal .wave3{ animation-delay: 1.06s; opacity:0; }
+    @keyframes wave-out{
+      0%{ transform: translate(-50%,-50%) scale(.35); opacity:.55; }
+      70%{ transform: translate(-50%,-50%) scale(4.2); opacity:0; }
+      100%{ transform: translate(-50%,-50%) scale(4.2); opacity:0; }
+    }
+    .online-signal .online-dot{
+      position: absolute;
+      left: var(--cx);
+      top: var(--cy);
+      transform: translate(-50%,-50%);
+      width: .52rem;
+      height: .52rem;
+      box-shadow: 0 0 12px rgba(34,197,94,.72);
+    }
+    .online-signal .online-dot::after{
+      inset: -7px;
+      border-color: rgba(34,197,94,.42);
+    }
+    #activeUsersCount{ line-height: 1; display: inline-flex; align-items: center; }
+
+    .online-tooltip{
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      padding: .35rem .55rem;
+      border-radius: .75rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.10));
+      border: 1px solid rgba(34,197,94,.45);
+      box-shadow: 0 10px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12px;
+      font-weight: 600;
+      color: #166534;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
+      z-index: 60;
+    }
+    .dark .online-tooltip{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.28));
+      border-color: rgba(34,197,94,.55);
+      color: #4ade80;
+    }
+    .online-pill:hover .online-tooltip{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== Language/FAQ overlay glass (как AOF) ===== */
+    .glass-menu{
+      background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.10));
+      border: 1px solid rgba(34,197,94,.45);
+      box-shadow: 0 12px 26px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.18);
+      border-radius: .75rem;
+      overflow: hidden;
+    }
+    .dark .glass-menu{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.28));
+      border-color: rgba(34,197,94,.55);
+    }
+    .glass-menu button:hover{ background: rgba(255,255,255,.16); }
+    .dark .glass-menu button:hover{ background: rgba(255,255,255,.08); }
+
+    /* ====== НОВОЕ: МОДАЛКА ВЫБОРА ЯЗЫКА/FAQ + ЗАМЫЛИВАНИЕ ФОНА (как AOF) ====== */
+    .lang-modal-backdrop{
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(0,0,0,.18);
+    }
+    .dark .lang-modal-backdrop{ background: rgba(0,0,0,.35); }
+
+    /* ====== УБРАТЬ "ПОЛОСУ" ОТ ФОКУСА (как AOF) ====== */
+    #langBtn:focus,
+    #langModalList button:focus,
+    #faqButtonTop:focus,
+    .support-top:focus,
+    #langBackBtn:focus,
+    #faqBackBtn:focus,
+    #mobileMenuToggle:focus,
+    #mobileLangBtn:focus,
+    #mobileFaqBtn:focus,
+    #mobileSupportBtn:focus{
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    #langBtn:focus-visible,
+    #langModalList button:focus-visible,
+    #faqButtonTop:focus-visible,
+    .support-top:focus-visible,
+    #langBackBtn:focus-visible,
+    #faqBackBtn:focus-visible,
+    #mobileMenuToggle:focus-visible,
+    #mobileLangBtn:focus-visible,
+    #mobileFaqBtn:focus-visible,
+    #mobileSupportBtn:focus-visible{
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(34,197,94,.35) !important;
+    }
+
+    /* ===== Font for ALL buttons (как AOF) ===== */
+    :root{
+      --pp-btn-font: ui-rounded, -apple-system, system-ui, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      --pp-header-h: 0px; /* для mobile menu */
+    }
+    button, .nav-badge, #supportLabelTop, #langCaption{
+      font-family: var(--pp-btn-font);
+    }
+
+    /* HARD KILL (как AOF) */
+    * { -webkit-tap-highlight-color: transparent; }
+    :focus,:focus-visible,:active{ outline:none !important; box-shadow:none !important; }
+    button,a,[role="button"],[tabindex]{ outline:none !important; box-shadow:none !important; -webkit-tap-highlight-color: transparent; }
+    button::-moz-focus-inner{ border:0; }
+
+    /* ===== Click zones: only image box ===== */
+    #langBtn, #faqButtonTop{ line-height: 0; }
+    #langCaption{ text-align:center; width:100%; pointer-events:none; }
+
+    /* ===== ДОБАВЛЕНО: MOBILE MENU (бургер -> крестик + выезд панели) ===== */
+    .mobile-burger{
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .6rem;
+      gap: .28rem;
+      flex-direction: column;
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      border: 1px solid rgba(34,197,94,.40);
+      box-shadow: 0 8px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .18s ease;
+      transform: translate3d(0,0,0);
+      touch-action: manipulation;
+    }
+    .dark .mobile-burger{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.24));
+      border-color: rgba(34,197,94,.5);
+    }
+    .mobile-burger:hover{ transform: translate3d(0,-1px,0); }
+
+    .mobile-burger .hm-line{
+      width: 1.3rem;
+      height: 2px;
+      border-radius: 9999px;
+      background: rgba(22,163,74,.95);
+      transition: transform .18s ease, opacity .18s ease, width .18s ease;
+      transform-origin: center;
+    }
+    .dark .mobile-burger .hm-line{ background: rgba(74,222,128,.95); }
+
+    .mobile-burger.open .hm-line:nth-child(1){
+      transform: translateY(.42rem) rotate(45deg);
+    }
+    .mobile-burger.open .hm-line:nth-child(2){
+      opacity: 0;
+      width: .2rem;
+    }
+    .mobile-burger.open .hm-line:nth-child(3){
+      transform: translateY(-.42rem) rotate(-45deg);
+    }
+
+    /* контейнер меню: по умолчанию "выключен" */
+    @media (max-width: 639px){
+      #mobileMenuWrap{
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .18s ease;
+      }
+      #mobileMenuWrap.open{
+        opacity: 1;
+        pointer-events: auto;
+      }
+      #mobileMenuPanel{
+        transform: translateX(120%);
+        transition: transform .22s ease;
+      }
+      #mobileMenuWrap.open #mobileMenuPanel{
+        transform: translateX(0);
+      }
+    }
+
+    .mobile-menu-item{
+      display:flex;
+      align-items:center;
+      gap:.75rem;
+      width:100%;
+      padding:.55rem .6rem;
+      border-radius: .85rem;
+      border: 1px solid rgba(34,197,94,.35);
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .dark .mobile-menu-item{
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
+      border-color: rgba(34,197,94,.45);
+    }
+    .mobile-menu-item:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.6); }
+    .mobile-menu-label{
+      font-weight: 700;
+      font-size: 13px;
+      color: #166534;
+      white-space: nowrap;
+    }
+    .dark .mobile-menu-label{ color: #4ade80; }
+
+    /* =========================================================
+       ✅ ИЗМЕНЕНИЕ: чуть увеличить верхний бар на мобайле (как AOF)
+       ========================================================= */
+    @media (max-width: 639px){
+      header .max-w-\[74rem\]{
+        padding-top: .65rem !important;
+        padding-bottom: .65rem !important;
+      }
+    }
+
+    /* ===== Main blocks styled to match AOF ===== */
+    .pp-game-tile{
+      border-radius: 1.25rem;
+      border: 1px solid rgba(34,197,94,.45);
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.18);
+      overflow: hidden;
+      transition: transform .18s ease, border-color .18s ease;
+      transform: translate3d(0,0,0);
+    }
+    .dark .pp-game-tile{
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(0,0,0,.24));
+      border-color: rgba(34,197,94,.55);
+    }
+    .pp-game-tile:hover{ transform: translate3d(0,-1px,0); border-color: rgba(34,197,94,.7); }
+
+    .pp-article-btn{
+      width: 100%;
+      text-align: left;
+      border-radius: 1rem;
+      padding: .9rem 1rem;
+      border: 1px solid rgba(34,197,94,.45);
+      background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.06));
+      box-shadow:
+        0 10px 24px rgba(0,0,0,.16),
+        inset 0 1px 0 rgba(255,255,255,.18);
+      transition: transform .18s ease, border-color .18s ease;
+      transform: translate3d(0,0,0);
+    }
+    .dark .pp-article-btn{
+      background: linear-gradient(135deg, rgba(0,0,0,.42), rgba(0,0,0,.22));
+      border-color: rgba(34,197,94,.55);
+    }
+    .pp-article-btn:hover{ transform: translate3d(0,-1px,0); border-color: rgba(34,197,94,.7); }
+
+    .pp-article-box{
+      border-radius: 1rem;
+      border: 1px solid rgba(34,197,94,.35);
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      overflow: hidden;
+    }
+    .dark .pp-article-box{
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
+      border-color: rgba(34,197,94,.45);
+    }
+
+    /* Язык-меню fixed (как AOF) */
+    #langMenu{
+      position: fixed !important;
+      z-index: 2147483647 !important;
+      top: 0;
+      left: 0;
+    }
+    header{ z-index: 9990 !important; }
+
+    /* ===== /HARD KILL ===== */
+  </style>
 </head>
-<body class="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white transition-colors relative diamond-bg">
 
-  <!-- Barra superior fija (логотип + онлайн + tema + idioma) -->
-  <header class="fixed top-0 left-0 right-0 z-30 backdrop-blur-md bg-white/70 dark:bg-black/40 border-b border-green-700/30">
-    <div class="max-w-[74rem] mx-auto px-4 py-2 flex items-center justify-between gap-3">
-      <!-- Logotipo (адаптивные размеры) -->
-      <a href="index.html" class="shrink-0 flex items-center gap-2">
-        <img src="images/PredictorPro.jpg" alt="PredictorPro"
-             class="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full border-4 border-green-700 object-cover"/>
-      </a>
+<body class="min-h-screen flex flex-col bg-white dark:bg-black text-gray-900 dark:text-white transition-colors relative diamond-bg" style="min-height:100dvh;">
+
+  <!-- Шапка (1-в-1 как Apple of Fortune) -->
+  <header class="fixed top-0 left-0 right-0 z-30 lgx-nav lgx-blur">
+    <div class="max-w-[74rem] mx-auto px-4 py-2 flex items-center justify-between gap-3 sm:gap-4 flex-wrap">
+
+      <!-- Логотип + Онлайн-индикатор слева -->
+      <div class="flex items-center gap-3 sm:gap-4">
+        <!-- КНОПКА-ЛОГОТИП (только изображение) -->
+        <a href="index.html"
+           class="shrink-0 inline-flex items-center justify-center p-0 transition-transform hover:scale-[1.02] focus:outline-none"
+           aria-label="Home">
+          <img
+            src="images/logo-predictorpro-liquid.png"
+            alt="PredictorPro"
+            onerror="this.onerror=null; this.src='images/PredictorPro.jpg';"
+            class="h-[4.25rem] sm:h-[5.25rem] lg:h-[5.75rem] w-auto select-none pointer-events-none -my-2" />
+        </a>
+
+        <!-- Онлайн-индикатор (1-в-1 AOF: без надписи + не сбрасывается при обновлении) -->
+        <div class="nav-badge online-pill text-[13px] font-semibold text-green-700 dark:text-green-400 relative">
+          <span class="online-signal" aria-hidden="true">
+            <span class="wave wave1"></span>
+            <span class="wave wave2"></span>
+            <span class="wave wave3"></span>
+            <span class="online-dot"></span>
+          </span>
+          <span id="activeUsersCount" class="tabular-nums leading-none">—</span>
+          <span id="onlineTooltip" class="online-tooltip">Users online</span>
+        </div>
+      </div>
 
       <div class="flex items-center gap-3 sm:gap-4">
-  <!-- Indicador de usuarios activos -->
-  <div class="flex items-center gap-2 px-2.5 py-1 rounded-full border border-green-600/70 bg-white/60 dark:bg-white/10 shadow-md">
-    <span class="relative flex h-3 w-3">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-    </span>
-    <span id="onlineLabel" class="hidden sm:inline text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">En línea</span>
-    <span id="activeUsersCount" class="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">—</span>
-  </div>
+        <!-- МОБИЛЬНОЕ МЕНЮ (бургер) -->
+        <button id="mobileMenuToggle"
+                class="sm:hidden mobile-burger focus:outline-none"
+                aria-label="Menu"
+                aria-expanded="false"
+                type="button">
+          <span class="hm-line"></span>
+          <span class="hm-line"></span>
+          <span class="hm-line"></span>
+        </button>
 
-  <!-- Переключатель языка (по середине) -->
-  <div class="relative">
-    <button id="langBtn"
-            class="h-10 px-4 rounded-full bg-gray-200 text-gray-900 shadow ring-2 ring-green-600 text-sm font-semibold flex items-center gap-2"
-            aria-haspopup="true" aria-expanded="false" aria-label="Select language">
-      <span>🌐</span><span id="langBtnLabel">العربية</span>
-    </button>
-    <div id="langMenu"
-         class="hidden absolute right-0 mt-2 w-18 bg-gray-800 text-white rounded-lg shadow-lg border border-green-700/60 overflow-hidden text-sm z-50">
-      <button data-lang="ar" data-dir="rtl"  data-langtag="ar-DZ" class="w-full text-right px-3 py-2 hover:bg-gray-700">العربية</button>
-      <button data-lang="es" data-dir="ltr"  data-langtag="es-PE" class="w-full text-left  px-3 py-2 hover:bg-gray-700">Español</button>
-      <button data-lang="en" data-dir="ltr"  data-langtag="en"     class="w-full text-left  px-3 py-2 hover:bg-gray-700">English</button>
-      <button data-lang="pl" data-dir="ltr"  data-langtag="pl"     class="w-full text-left  px-3 py-2 hover:bg-gray-700">Polski</button>
-      <button data-lang="fr" data-dir="ltr"  data-langtag="fr"     class="w-full text-left  px-3 py-2 hover:bg-gray-700">Français</button>
-    </div>
-  </div>
+        <!-- ДЕСКТОПНЫЕ КНОПКИ (скрыты на мобайле) -->
+        <div id="desktopTopActions" class="hidden sm:flex items-center gap-3 sm:gap-4">
 
-  <!-- Переключатель темы (справа) -->
-  <button
-    id="themeToggle"
-    class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 shadow-lg transition-colors ring-2 ring-green-600 ring-offset-2 ring-offset-transparent"
-    onclick="toggleTheme()"
-    aria-label="Cambiar tema"
-  >🌙</button>
-</div>
+          <!-- Выбор языка -->
+          <div class="relative flex flex-col items-center w-16 sm:w-20">
+            <button id="langBtn"
+                    class="inline-flex items-center justify-center p-0 m-0 bg-transparent border-0 shadow-none rounded-none transition-transform hover:scale-105 focus:outline-none"
+                    aria-haspopup="true" aria-expanded="false" aria-label="Select language"
+                    type="button">
+              <img
+                src="images/lang-button.png"
+                alt=""
+                class="w-16 h-16 sm:w-20 sm:h-20 object-contain block pointer-events-none select-none" />
+              <span id="langBtnLabel" class="sr-only">Español</span>
+            </button>
+            <span id="langCaption" class="mt-1 text-[11px] leading-none font-semibold text-green-700 dark:text-green-400 whitespace-nowrap select-none">
+              Idioma
+            </span>
+
+            <!-- оставлено в DOM (как AOF) -->
+            <div id="langMenu" class="hidden w-32 glass-menu text-sm py-1">
+              <button data-lang="ar" class="w-full text-right px-3 py-2 focus:outline-none" type="button">العربية</button>
+              <button data-lang="es" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Español</button>
+              <button data-lang="en" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">English</button>
+              <button data-lang="pl" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Polski</button>
+              <button data-lang="fr" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Français</button>
+            </div>
+          </div>
+
+          <!-- FAQ + SUPPORT (как AOF) -->
+          <div class="flex items-center gap-3">
+            <div class="flex flex-col items-center gap-1 w-16 sm:w-20">
+              <button id="faqButtonTop"
+                      class="inline-flex items-center justify-center p-0 m-0 bg-transparent border-0 shadow-none rounded-none transition-transform hover:scale-105 focus:outline-none"
+                      aria-label="FAQ"
+                      type="button">
+                <img
+                  src="images/faq-logo.png"
+                  alt=""
+                  class="w-16 h-16 sm:w-20 sm:h-20 object-contain block pointer-events-none select-none"
+                  onerror="(function(img){
+                    const list=[
+                      'images/faq-logo.png','images/faq-logo.webp','images/faq-logo.jpg','images/faq-logo.jpeg',
+                      'images/FAQ-logo.png','images/FAQ-logo.webp','images/FAQ-logo.jpg','images/FAQ-logo.jpeg',
+                      'images/faq.png','images/faq.webp','images/faq.jpg','images/faq.jpeg'
+                    ];
+                    const i=(parseInt(img.dataset.try||'0',10));
+                    if(i < list.length-1){ img.dataset.try=String(i+1); img.src=list[i+1]; }
+                    else { img.style.display='none'; }
+                  })(this);" />
+              </button>
+              <span class="text-[11px] leading-none font-semibold text-green-700 dark:text-green-400 whitespace-nowrap select-none pointer-events-none">FAQ</span>
+            </div>
+
+            <div class="flex flex-col items-center gap-1 w-16 sm:w-20">
+              <a href="https://t.me/Pedro_PredictorPro_bot"
+                 class="support-top inline-flex items-center justify-center p-0 m-0 bg-transparent border-0 shadow-none rounded-none transition-transform hover:scale-105 focus:outline-none"
+                 target="_blank" rel="noopener noreferrer"
+                 aria-label="Support chat">
+                <img
+                  src="images/support-icon.png"
+                  alt="Support"
+                  class="w-16 h-16 sm:w-20 sm:h-20 object-contain block pointer-events-none select-none"
+                  onerror="this.onerror=null; this.src='images/—Pngtree—technical support_3767452.png';"
+                />
+              </a>
+              <span id="supportLabelTop" class="text-[11px] leading-none font-semibold text-green-700 dark:text-green-400 whitespace-nowrap select-none pointer-events-none">
+                Soporte
+              </span>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Основной контент: отступ сверху под фиксированную шапку и снизу под кнопку чата -->
-  <main class="flex flex-col items-center pt-28 sm:pt-36 lg:pt-48 pb-36 sm:pb-28 px-4">
+  <!-- МОБИЛЬНАЯ ВЫЕЗЖАЮЩАЯ ПАНЕЛЬ (Язык/FAQ/Support) (1-в-1 AOF) -->
+  <div id="mobileMenuWrap" class="sm:hidden fixed inset-0 z-[9988]">
+    <div id="mobileMenuBg" class="absolute inset-0 lang-modal-backdrop"></div>
+
+    <div id="mobileMenuPanel"
+         class="absolute right-4 w-56 lgx-card lgx-blur lgx-sheen p-3"
+         style="top: calc(var(--pp-header-h) + .5rem);">
+      <div class="flex flex-col gap-2">
+        <button id="mobileLangBtn" class="mobile-menu-item focus:outline-none" aria-label="Language" type="button">
+          <img src="images/lang-button.png" alt="" class="w-10 h-10 object-contain pointer-events-none select-none">
+          <span id="mobileLangText" class="mobile-menu-label">Idioma</span>
+        </button>
+
+        <button id="mobileFaqBtn" class="mobile-menu-item focus:outline-none" aria-label="FAQ" type="button">
+          <img src="images/faq-logo.png" alt="" class="w-10 h-10 object-contain pointer-events-none select-none"
+               onerror="(function(img){
+                 const list=[
+                   'images/faq-logo.png','images/faq-logo.webp','images/faq-logo.jpg','images/faq-logo.jpeg',
+                   'images/FAQ-logo.png','images/FAQ-logo.webp','images/FAQ-logo.jpg','images/FAQ-logo.jpeg',
+                   'images/faq.png','images/faq.webp','images/faq.jpg','images/faq.jpeg'
+                 ];
+                 const i=(parseInt(img.dataset.try||'0',10));
+                 if(i < list.length-1){ img.dataset.try=String(i+1); img.src=list[i+1]; }
+                 else { img.style.display='none'; }
+               })(this);">
+          <span class="mobile-menu-label">FAQ</span>
+        </button>
+
+        <a id="mobileSupportBtn"
+           href="https://t.me/Pedro_PredictorPro_bot"
+           target="_blank" rel="noopener noreferrer"
+           class="mobile-menu-item focus:outline-none"
+           aria-label="Support chat">
+          <img src="images/support-icon.png" alt="Support" class="w-10 h-10 object-contain pointer-events-none select-none"
+               onerror="this.onerror=null; this.src='images/—Pngtree—technical support_3767452.png';">
+          <span id="mobileSupportText" class="mobile-menu-label">Soporte</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <!-- /MOBILE MENU -->
+
+  <!-- МОДАЛКА ВЫБОРА ЯЗЫКА (по центру) + blur (1-в-1 AOF) -->
+  <div id="langOverlay" class="hidden fixed inset-0 z-[9998] flex items-center justify-center px-4">
+    <div id="langOverlayBg" class="absolute inset-0 lang-modal-backdrop"></div>
+
+    <div class="relative w-full max-w-xs sm:max-w-sm glass-menu">
+      <button id="langBackBtn" class="relative w-full px-3 py-2 font-semibold focus:outline-none" type="button">
+        <span class="pp-back-icon absolute left-3 top-1/2 -translate-y-1/2 text-green-700 dark:text-green-400" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span id="langBackText" class="block w-full text-center">Back</span>
+      </button>
+      <div class="h-px bg-black/10 dark:bg-white/10"></div>
+
+      <div id="langModalList" class="py-1 text-sm">
+        <button data-lang="ar" class="w-full text-right px-3 py-2 focus:outline-none" type="button">العربية</button>
+        <button data-lang="es" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Español</button>
+        <button data-lang="en" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">English</button>
+        <button data-lang="pl" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Polski</button>
+        <button data-lang="fr" class="w-full text-left  px-3 py-2 focus:outline-none" type="button">Français</button>
+      </div>
+    </div>
+  </div>
+  <!-- /LANG OVERLAY -->
+
+  <!-- FAQ (по центру) + blur (как AOF) -->
+  <div id="faqOverlay" class="hidden fixed inset-0 z-[9997] flex items-center justify-center px-4">
+    <div id="faqOverlayBg" class="absolute inset-0 lang-modal-backdrop"></div>
+
+    <div class="relative w-full max-w-xs sm:max-w-sm glass-menu">
+      <button id="faqBackBtn" class="relative w-full px-3 py-2 font-semibold focus:outline-none" type="button">
+        <span class="pp-back-icon absolute left-3 top-1/2 -translate-y-1/2 text-green-700 dark:text-green-400" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span id="faqBackText" class="block w-full text-center">Back</span>
+      </button>
+      <div class="h-px bg-black/10 dark:bg-white/10"></div>
+
+      <div id="faqPanel" class="p-4 max-h-[70vh] overflow-auto">
+        <h3 id="faqTitle" class="text-lg font-semibold mb-2">FAQ</h3>
+        <p id="faqIntro1" class="text-sm mb-2">This section is under maintenance.</p>
+        <p id="faqIntro2" class="text-sm mb-4">Please try again later.</p>
+
+        <h4 id="faqQ1" class="text-md font-semibold mb-1">How do the forecasts work?</h4>
+        <p id="faqA1" class="text-sm mb-3">We analyze data to choose the best moment.</p>
+
+        <h4 id="faqQ2" class="text-md font-semibold mb-1">How accurate are they?</h4>
+        <p id="faqA2" class="text-sm">With proper bankroll management, accuracy can be high.</p>
+      </div>
+    </div>
+  </div>
+  <!-- /FAQ OVERLAY -->
+
+  <!-- Основной контент (не трогал) -->
+  <main class="flex-1 flex flex-col items-center pt-28 sm:pt-36 lg:pt-48 pb-8 sm:pb-10 px-4">
     <div class="w-full max-w-[58rem]">
+
       <!-- Cuadrícula de botones de juegos -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8 lg:gap-10">
         <!-- Aviador -->
         <div class="flex flex-col items-center">
           <a href="aviator.html"
-             class="w-full sm:w-40 aspect-square bg-black rounded-2xl flex items-center justify-center overflow-hidden border-2 border-green-700 transition-colors">
+             class="pp-game-tile lgx-blur lgx-sheen w-full sm:w-40 aspect-square flex items-center justify-center">
             <img src="images/awiator-1win.png" alt="Aviador" class="w-full h-full object-contain"/>
           </a>
           <span id="gameAviator" class="mt-2 text-base sm:text-lg font-semibold text-black dark:text-white">Aviator</span>
         </div>
+
         <!-- Penalti -->
         <div class="flex flex-col items-center">
           <a href="penalty.html"
-             class="w-full sm:w-40 aspect-square bg-blue-200 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-green-700 transition-colors">
+             class="pp-game-tile lgx-blur lgx-sheen w-full sm:w-40 aspect-square flex items-center justify-center">
             <img src="images/penaltyshootoutstreet_logo.png" alt="Penalti" class="w-full h-full object-contain"/>
           </a>
           <span id="gamePenalty" class="mt-2 text-base sm:text-lg font-semibold text-black dark:text-white">Penalty</span>
         </div>
+
         <!-- Minas -->
         <div class="flex flex-col items-center">
           <a href="mines.html"
-             class="w-full sm:w-40 aspect-square bg-white rounded-2xl flex items-center justify-center overflow-hidden border-2 border-green-700 transition-colors">
-            <img src="images/images.jpg" alt="Minas" class="w-full h-full object-cover"/>
+             class="pp-game-tile lgx-blur lgx-sheen w-full sm:w-40 aspect-square flex items-center justify-center">
+            <img src="images/images.png" alt="Minas" class="w-full h-full object-cover"/>
           </a>
           <span id="gameMines" class="mt-2 text-base sm:text-lg font-semibold text-black dark:text-white">Mines</span>
         </div>
+
         <!-- Manzanas de la Fortuna -->
         <div class="flex flex-col items-center">
           <a href="apple-of-fortune.html"
-             class="w-full sm:w-40 aspect-square bg-white rounded-2xl flex items-center justify-center overflow-hidden border-2 border-green-700 transition-colors">
+             class="pp-game-tile lgx-blur lgx-sheen w-full sm:w-40 aspect-square flex items-center justify-center">
             <img src="images/unnamed.png" alt="Manzanas de la Fortuna" class="w-full h-full object-contain"/>
           </a>
           <span id="gameApple" class="mt-2 text-base sm:text-lg font-semibold text-black dark:text-white">Apple Of Fortune</span>
@@ -140,20 +746,22 @@
       </div>
 
       <!-- Noticias del proyecto -->
-      <section class="mt-10 sm:mt-12 p-4 sm:p-6 rounded-2xl border-2 border-green-700/70 bg-white/60 dark:bg-black/40 backdrop-blur-md shadow-xl">
+      <section class="mt-10 sm:mt-12 lgx-card lgx-blur lgx-sheen p-4 sm:p-6">
         <h2 id="newsHeader" class="text-lg sm:text-xl font-semibold text-center text-black dark:text-white">
           Noticias del proyecto
         </h2>
+
         <div class="mt-4 sm:mt-6 space-y-6">
+
           <!-- Noticia 0 -->
           <div>
-            <button id="news0Title" class="w-full py-3 sm:py-4 bg-gray-200 dark:bg-gray-800 rounded-lg text-left px-4 sm:px-6 
-                           border-2 border-green-700 dark:border-green-700 dark:text-white transition-colors toggle-btn">
+            <button id="news0Title" class="pp-article-btn toggle-btn focus:outline-none" type="button">
               ¡Hermanoooos, victoria histórica de Jorge Reyes!
             </button>
             <p class="mt-1 ml-4 sm:ml-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">13.05.2025</p>
-            <div class="mt-2 px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg hidden article">
-              <img id="news0Img" src="images/vot8fd10b8.png" alt="Jorge con su nuevo auto" class="w-full mb-4 rounded" />
+
+            <div class="mt-2 px-4 sm:px-6 py-4 pp-article-box hidden article">
+              <img id="news0Img" src="images/vot8fd10b8.png" alt="Jorge con su nuevo auto" class="w-full mb-4 rounded-xl" />
               <p id="news0p1" class="mb-2">
                 ¡Hermanoooos, hoy es fiesta total! 🎉 Quiero felicitar a mi alumno, mi amigo y mi hermano del alma — Jorge Reyes de Trujillo, que acaba de ganar el premio más grande en la historia de PredictorPro: ¡2 000 000 PEN! 😱💰
               </p>
@@ -176,12 +784,11 @@
 
           <!-- Noticia 1 -->
           <div>
-            <button id="news1Title" class="w-full py-3 sm:py-4 bg-gray-200 dark:bg-gray-800 rounded-lg text-left px-4 sm:px-6 
-                           border-2 border-green-700 dark:border-green-700 dark:text-white transition-colors toggle-btn">
+            <button id="news1Title" class="pp-article-btn toggle-btn focus:outline-none" type="button">
               Aniversario del proyecto PredictorPro
             </button>
             <p class="mt-1 ml-4 sm:ml-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">10.05.2025</p>
-            <div class="mt-2 px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg hidden article">
+            <div class="mt-2 px-4 sm:px-6 py-4 pp-article-box hidden article">
               <p id="news1p1" class="mb-2">
                 ¡Nuestro proyecto PredictorPro cumple un año! En este tiempo, cientos de participantes lograron resultados extraordinarios, cambiaron su vida y empezaron a ganar sumas importantes. Gracias a todos por su apoyo: ahora somos una gran familia que apunta a nuevas metas. Para celebrar, PredictorPro será gratuito durante todo un mes. ¡Les deseamos mucha suerte y grandes victorias!
               </p>
@@ -190,12 +797,11 @@
 
           <!-- Noticia 2 -->
           <div>
-            <button id="news2Title" class="w-full py-3 sm:py-4 bg-gray-200 dark:bg-gray-800 rounded-lg text-left px-4 sm:px-6 
-                           border-2 border-green-700 dark:border-green-700 dark:text-white transition-colors toggle-btn">
+            <button id="news2Title" class="pp-article-btn toggle-btn focus:outline-none" type="button">
               Actualización del juego «Minas»
             </button>
             <p class="mt-1 ml-4 sm:ml-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">08.05.2025</p>
-            <div class="mt-2 px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg hidden article">
+            <div class="mt-2 px-4 sm:px-6 py-4 pp-article-box hidden article">
               <p id="news2p1">
                 Hoy mejoramos sustancialmente el sistema de predicciones para «Minas». Gracias a un análisis profundo de datos, nuestra precisión alcanza el 97 %. ¡Compruébalo tú mismo!
               </p>
@@ -204,12 +810,11 @@
 
           <!-- Noticia 3 -->
           <div>
-            <button id="news3Title" class="w-full py-3 sm:py-4 bg-gray-200 dark:bg-gray-800 rounded-lg text-left px-4 sm:px-6 
-                           border-2 border-green-700 dark:border-green-700 dark:text-white transition-colors toggle-btn">
+            <button id="news3Title" class="pp-article-btn toggle-btn focus:outline-none" type="button">
               Anuncio de la nueva función «Historial de apuestas»
             </button>
             <p class="mt-1 ml-4 sm:ml-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">06.05.2025</p>
-            <div class="mt-2 px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg hidden article">
+            <div class="mt-2 px-4 sm:px-6 py-4 pp-article-box hidden article">
               <p id="news3p1">
                 Lanzamos «Historial de apuestas»: ahora puedes revisar y analizar todas tus predicciones de cada sesión en un solo lugar.
               </p>
@@ -218,12 +823,11 @@
 
           <!-- Noticia 4 -->
           <div>
-            <button id="news4Title" class="w-full py-3 sm:py-4 bg-gray-200 dark:bg-gray-800 rounded-lg text-left px-4 см:px-6 
-                           border-2 border-green-700 dark:border-green-700 dark:text-white transition-colors toggle-btn">
+            <button id="news4Title" class="pp-article-btn toggle-btn focus:outline-none" type="button">
               Desarrollo de la aplicación móvil PredictorPro
             </button>
             <p class="mt-1 ml-4 sm:ml-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">04.05.2025</p>
-            <div class="mt-2 px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg hidden article">
+            <div class="mt-2 px-4 sm:px-6 py-4 pp-article-box hidden article">
               <p id="news4p1">
                 Estamos desarrollando activamente la aplicación móvil PredictorPro. Lanzamiento previsto: 28 de mayo de 2025.
               </p>
@@ -232,52 +836,33 @@
 
           <!-- Noticia 5 -->
           <div>
-            <button id="news5Title" class="w-full py-3 sm:py-4 bg-gray-200 dark:bg-gray-800 rounded-lg text-left px-4 sm:px-6 
-                           border-2 border-green-700 dark:border-green-700 dark:text-white transition-colors toggle-btn">
+            <button id="news5Title" class="pp-article-btn toggle-btn focus:outline-none" type="button">
               Actualización de UI/UX: nuevos temas de diseño
             </button>
             <p class="mt-1 ml-4 sm:ml-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400">30.04.2025</p>
-            <div class="mt-2 px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg hidden article">
+            <div class="mt-2 px-4 sm:px-6 py-4 pp-article-box hidden article">
               <p id="news5p1">
                 Hemos renovado la interfaz: añadimos nuevos esquemas de color, mejoramos la navegación y optimizamos los controles para una experiencia más cómoda.
               </p>
             </div>
           </div>
+
         </div>
       </section>
     </div>
   </main>
 
-  <!-- Нижний бар (копирайт) -->
-  <footer class="border-t border-green-700/30 bg-white/70 dark:bg-black/40 backdrop-blur-md">
-    <div class="max-w-[74rem] mx-auto px-4 py-4 text-center text-sm text-gray-700 dark:text-gray-300">
-      Copyright © 2024-2025 "Predictor-Pro". <span id="rightsLabel">All rights reserved.</span>
-    </div>
-  </footer>
-
-  <!-- Botón de chat de soporte + etiqueta (закреплено снизу справа) -->
-  <div class="fixed bottom-4 right-4 z-30 flex flex-col items-center space-y-2 p-3 rounded-2xl border-2 border-green-700/70 bg-white/70 dark:bg-white/10 backdrop-blur-md shadow-xl">
-    <a href="https://t.me/Hamza_PredictorPro_bot"
-       class="bg-gray-200 dark:bg-gray-800 p-2 rounded-full border-4 border-green-700 transition-transform hover:scale-105"
-       target="_blank" rel="noopener noreferrer" aria-label="Chat de soporte" id="supportLinkAria">
-      <img
-        src="images/—Pngtree—technical support_3767452.png"
-        alt="Soporte"
-        class="w-14 h-14 sm:w-16 sm:h-16 filter dark:invert"
-      />
-    </a>
-    <span id="supportChatLabel" class="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-400">Chat de soporte</span>
+  <!-- Нижний бар (копирайт) — как AOF: fixed + lgx-nav -->
+  <div id="pageFooterBar"
+     class="w-full lgx-nav lgx-blur mt-auto shrink-0"
+     style="border-bottom:0 !important; box-shadow:none !important; margin:0 !important;">
+  <div class="max-w-[74rem] mx-auto px-4 py-2 text-center text-[12px] sm:text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
+    Copyright © 2025-2026 "Predictor-Pro". <span id="rightsLabel">All rights reserved.</span>
   </div>
+</div>
 
   <script>
     document.documentElement.classList.add('dark');
-    const themeToggleEl = document.getElementById('themeToggle');
-    themeToggleEl.textContent = '🌞'; // Иконка солнца при тёмной теме по умолчанию
-
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      themeToggleEl.textContent = document.documentElement.classList.contains('dark') ? '🌞' : '🌙';
-    }
 
     document.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -285,27 +870,45 @@
       });
     });
 
-    // ==== Lógica del indicador de usuarios activos ====
+    /* ==== Онлайн-индикатор (как AOF): 1..3 шаг, не сбрасывается при обновлении ==== */
     const usersEl = document.getElementById('activeUsersCount');
+    const MIN_USERS = 20;
+    const MAX_USERS = 80;
+    const LS_KEY = 'pp_online_users_v1';
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+    let saved = null;
+    try { saved = parseInt(localStorage.getItem(LS_KEY), 10); } catch(_) {}
+    let currentUsers = Number.isFinite(saved) ? clamp(saved, MIN_USERS, MAX_USERS)
+      : Math.floor(MIN_USERS + Math.random() * (MAX_USERS - MIN_USERS + 1));
+    usersEl.textContent = currentUsers;
+    try { localStorage.setItem(LS_KEY, String(currentUsers)); } catch(_) {}
     function updateUsers() {
-      const min = 120, max = 340;
-      usersEl.textContent = Math.floor(min + Math.random() * (max - min));
+      const step = 1 + Math.floor(Math.random() * 3);
+      const dir  = Math.random() < 0.5 ? -1 : 1;
+      currentUsers = clamp(currentUsers + dir * step, MIN_USERS, MAX_USERS);
+      usersEl.textContent = currentUsers;
+      try { localStorage.setItem(LS_KEY, String(currentUsers)); } catch(_) {}
     }
-    updateUsers();
     setInterval(updateUsers, 5000);
-    // ==================================================
 
     // ==================== I18N (5 языков) ====================
     const I18N = {
       ar: {
-        langName:'العربية', langTag:'ar-DZ', dir:'ltr',
+        langName:'العربية', langTag:'ar-DZ', dir:'rtl',
         title:'PredictorPro – الصفحة الرئيسية',
         themeAria:'تبديل السمة',
-        online:'متصل',
-        support:'دردشة الدعم',
+        support:'الدعم',
+        langCaption:'اللغة',
+        usersOnline:'المستخدمون عبر الإنترنت',
+        back:'رجوع',
         games:{ aviator:'أفياتور', penalty:'ضربة جزاء', mines:'الألغام', apple:'تفاحة الحظ' },
         newsHeader:'أخبار المشروع',
         rights:'جميع الحقوق محفوظة.',
+        faqTitle:'الأسئلة الشائعة',
+        faqIntro1:'هذه الصفحة غير متوفرة حالياً بسبب الصيانة التقنية.',
+        faqIntro2:'يرجى المحاولة لاحقاً. شكراً لتفهمك!',
+        q1:'كيف تعمل التوقعات؟', a1:'نقوم بتحليل البيانات لاختيار أفضل توقيت.',
+        q2:'ما دقة التوقعات؟', a2:'مع إدارة صحيحة لرأس المال تكون النتائج أفضل.',
         news:[
           {
             title:'يا إخوة! فوز تاريخي لجورجي رييس!',
@@ -324,33 +927,28 @@
               'مشروعنا PredictorPro يُتم عامه الأول! خلال هذه الفترة حقق مئات المشاركين نتائج مذهلة وغيّروا حياتهم وبدؤوا في جني أرباح مهمة. شكرًا للجميع على الدعم — نحن الآن عائلة كبيرة بأهداف جديدة. احتفالًا بالمناسبة سيكون PredictorPro مجانيًا لمدة شهر كامل. نتمنى لكم التوفيق والانتصارات!'
             ]
           },
-          {
-            title:'تحديث لعبة «الألغام»',
-            p:[ 'قمنا اليوم بتحسينات كبيرة على نظام التنبؤ للعبة «الألغام». بفضل التحليل العميق للبيانات بلغت دقتنا 97٪. جرّب بنفسك!' ]
-          },
-          {
-            title:'ميزة جديدة: «سجل الرهانات»',
-            p:[ 'أطلقنا «سجل الرهانات» — الآن يمكنك مراجعة وتحليل جميع توقعاتك لكل جلسة في مكان واحد.' ]
-          },
-          {
-            title:'تطوير تطبيق PredictorPro للهواتف',
-            p:[ 'نطوّر بنشاط تطبيق PredictorPro للهواتف. الإطلاق المخطط: 28 مايو 2025.' ]
-          },
-          {
-            title:'تحديث واجهة المستخدم/التجربة',
-            p:[ 'جدّدنا الواجهة: أضفنا مخططات ألوان جديدة، وحسّنّا التنقل، وخصصنا عناصر التحكم لتجربة أكثر راحة.' ]
-          }
+          { title:'تحديث لعبة «الألغام»', p:[ 'قمنا اليوم بتحسينات كبيرة على نظام التنبؤ للعبة «الألغام». بفضل التحليل العميق للبيانات بلغت دقتنا 97٪. جرّب بنفسك!' ] },
+          { title:'ميزة جديدة: «سجل الرهانات»', p:[ 'أطلقنا «سجل الرهانات» — الآن يمكنك مراجعة وتحليل جميع توقعاتك لكل جلسة في مكان واحد.' ] },
+          { title:'تطوير تطبيق PredictorPro للهواتف', p:[ 'نطوّر بنشاط PredictorPro للهواتف. الإطلاق المخطط: 28 مايو 2025.' ] },
+          { title:'تحديث واجهة المستخدم/التجربة', p:[ 'جدّدنا الواجهة: أضفنا مخططات ألوان جديدة، وحسّنّا التنقل، وخصصنا عناصر التحكم لتجربة أكثر راحة.' ] }
         ]
       },
       es: {
         langName:'Español', langTag:'es-PE', dir:'ltr',
         title:'PredictorPro – Página principal',
         themeAria:'Cambiar tema',
-        online:'En línea',
-        support:'Chat de soporte',
+        support:'Soporte',
+        langCaption:'Idioma',
+        usersOnline:'Usuarios en línea',
+        back:'Atrás',
         games:{ aviator:'Aviator', penalty:'Penalty', mines:'Mines', apple:'Apple Of Fortune' },
         newsHeader:'Noticias del proyecto',
         rights:'Todos los derechos reservados.',
+        faqTitle:'Preguntas frecuentes',
+        faqIntro1:'Esta sección está en mantenimiento.',
+        faqIntro2:'Vuelve a intentarlo más tarde. ¡Gracias!',
+        q1:'¿Cómo funcionan las previsiones?', a1:'Analizamos datos para elegir el mejor momento.',
+        q2:'¿Qué precisión tienen?', a2:'Con buena gestión del bankroll, mejora la estabilidad.',
         news:[
           {
             title:'¡Hermanoooos, victoria histórica de Jorge Reyes!',
@@ -367,33 +965,28 @@
             title:'Aniversario del proyecto PredictorPro',
             p:[ '¡Nuestro proyecto PredictorPro cumple un año! En este tiempo, cientos de participantes lograron resultados extraordinarios, cambiaron su vida y empezaron a ganar sumas importantes. Gracias a todos por su apoyo: ahora somos una gran familia que apunta a nuevas metas. Para celebrar, PredictorPro será gratuito durante todo un mes. ¡Les deseamos mucha suerte y grandes victorias!' ]
           },
-          {
-            title:'Actualización del juego «Minas»',
-            p:[ 'Hoy mejoramos sustancialmente el sistema de predicciones para «Minas». Gracias a un análisis profundo de datos, nuestra precisión alcanza el 97 %. ¡Compruébalo tú mismo!' ]
-          },
-          {
-            title:'Anuncio de la nueva función «Historial de apuestas»',
-            p:[ 'Lanzamos «Historial de apuestas»: ahora puedes revisar y analizar todas tus predicciones de cada sesión en un solo lugar.' ]
-          },
-          {
-            title:'Desarrollo de la aplicación móvil PredictorPro',
-            p:[ 'Estamos desarrollando activamente la aplicación móvil PredictorPro. Lanzamiento previsto: 28 de mayo de 2025.' ]
-          },
-          {
-            title:'Actualización de UI/UX: nuevos temas de diseño',
-            p:[ 'Hemos renovado la interfaz: añadimos nuevos esquemas de color, mejoramos la navegación y optimizamos los controles para una experiencia más cómoda.' ]
-          }
+          { title:'Actualización del juego «Minas»', p:[ 'Hoy mejoramos sustancialmente el sistema de predicciones para «Minas». Gracias a un análisis profundo de datos, nuestra precisión alcanza el 97 %. ¡Compruébalo tú mismo!' ] },
+          { title:'Anuncio de la nueva función «Historial de apuestas»', p:[ 'Lanzamos «Historial de apuestas»: ahora puedes revisar y analizar todas tus predicciones de cada sesión en un solo lugar.' ] },
+          { title:'Desarrollo de la aplicación móvil PredictorPro', p:[ 'Estamos desarrollando activamente la aplicación móvil PredictorPro. Lanzamiento previsto: 28 de mayo de 2025.' ] },
+          { title:'Actualización de UI/UX: nuevos temas de diseño', p:[ 'Hemos renovado la interfaz: añadimos nuevos esquemas de color, mejoramos la navegación y optimizamos los controles para una experiencia más cómoda.' ] }
         ]
       },
       en: {
         langName:'English', langTag:'en', dir:'ltr',
         title:'PredictorPro – Home',
         themeAria:'Toggle theme',
-        online:'Online',
-        support:'Support chat',
+        support:'Support',
+        langCaption:'Language',
+        usersOnline:'Users online',
+        back:'Back',
         games:{ aviator:'Aviator', penalty:'Penalty', mines:'Mines', apple:'Apple of Fortune' },
         newsHeader:'Project news',
         rights:'All rights reserved.',
+        faqTitle:'FAQ',
+        faqIntro1:'This section is under maintenance.',
+        faqIntro2:'Please try again later.',
+        q1:'How do the forecasts work?', a1:'We analyze data to choose the best timing.',
+        q2:'How accurate are they?', a2:'With proper bankroll management, results improve.',
         news:[
           {
             title:'Brothers! A historic win by Jorge Reyes!',
@@ -406,37 +999,29 @@
               'This is not luck — it\'s work, faith, and good decisions. Jorge already won. Your turn.'
             ]
           },
-          {
-            title:'PredictorPro project anniversary',
-            p:[ 'Our PredictorPro project turns one! In this time, hundreds achieved standout results, changed their lives, and started earning serious money. Thank you for your support — we are now a big family aiming for new goals. To celebrate, PredictorPro is free for a full month. Wishing you luck and big wins!' ]
-          },
-          {
-            title:'“Mines” game update',
-            p:[ 'We significantly improved the prediction system for “Mines”. Thanks to deep data analysis our accuracy reaches 97%. Try it yourself!' ]
-          },
-          {
-            title:'New feature: “Bet history”',
-            p:[ 'We launched “Bet history”: now you can review and analyze all your session predictions in one place.' ]
-          },
-          {
-            title:'PredictorPro mobile app development',
-            p:[ 'We are actively developing the PredictorPro mobile app. Planned release: May 28, 2025.' ]
-          },
-          {
-            title:'UI/UX refresh: new themes',
-            p:[ 'We revamped the interface: added new color schemes, improved navigation, and optimized controls for a smoother experience.' ]
-          }
+          { title:'PredictorPro project anniversary', p:[ 'Our PredictorPro project turns one! In this time, hundreds achieved standout results, changed their lives, and started earning serious money. Thank you for your support — we are now a big family aiming for new goals. To celebrate, PredictorPro is free for a full month. Wishing you luck and big wins!' ] },
+          { title:'“Mines” game update', p:[ 'We significantly improved the prediction system for “Mines”. Thanks to deep data analysis our accuracy reaches 97%. Try it yourself!' ] },
+          { title:'New feature: “Bet history”', p:[ 'We launched “Bet history”: now you can review and analyze all your session predictions in one place.' ] },
+          { title:'PredictorPro mobile app development', p:[ 'We are actively developing the PredictorPro mobile app. Planned release: May 28, 2025.' ] },
+          { title:'UI/UX refresh: new themes', p:[ 'We revamped the interface: added new color schemes, improved navigation, and optimized controls for a smoother experience.' ] }
         ]
       },
       pl: {
         langName:'Polski', langTag:'pl', dir:'ltr',
         title:'PredictorPro – Strona główna',
         themeAria:'Przełącz motyw',
-        online:'Online',
-        support:'Czat wsparcia',
+        support:'Wsparcie',
+        langCaption:'Język',
+        usersOnline:'Użytkownicy online',
+        back:'Wstecz',
         games:{ aviator:'Aviator', penalty:'Rzut karny', mines:'Miny', apple:'Jabłko Fortuny' },
         newsHeader:'Aktualności projektu',
         rights:'Wszelkie prawa zastrzeżone.',
+        faqTitle:'FAQ',
+        faqIntro1:'Ta sekcja jest w trakcie prac serwisowych.',
+        faqIntro2:'Spróbuj ponownie później.',
+        q1:'Jak działają prognozy?', a1:'Analizujemy dane, by wybrać najlepszy moment.',
+        q2:'Jaka jest skuteczność?', a2:'Przy dobrej strategii zarządzania jest stabilniej.',
         news:[
           {
             title:'Bracia! Historyczne zwycięstwo Jorge Reyesa!',
@@ -449,37 +1034,29 @@
               'To nie jest szczęście — to praca, wiara i właściwe decyzje. Jorge już wygrał. Teraz Ty.'
             ]
           },
-          {
-            title:'Rocznica projektu PredictorPro',
-            p:[ 'Nasz projekt PredictorPro kończy rok! W tym czasie setki uczestników osiągnęły znakomite wyniki, odmieniły życie i zaczęły dobrze zarabiać. Dziękujemy za wsparcie — jesteśmy jedną, wielką rodziną z nowymi celami. Z tej okazji PredictorPro będzie darmowy przez cały miesiąc. Powodzenia i wielkich wygranych!' ]
-          },
-          {
-            title:'Aktualizacja gry „Miny”',
-            p:[ 'Dziś mocno usprawniliśmy system predykcji dla „Min”. Dzięki głębokiej analizie danych nasza skuteczność sięga 97%. Sprawdź sam!' ]
-          },
-          {
-            title:'Nowa funkcja: „Historia zakładów”',
-            p:[ 'Wprowadziliśmy „Historię zakładów”: teraz przejrzysz i przeanalizujesz wszystkie swoje prognozy z każdej sesji w jednym miejscu.' ]
-          },
-          {
-            title:'Prace nad aplikacją mobilną PredictorPro',
-            p:[ 'Aktywnie tworzymy aplikację mobilną PredictorPro. Planowana premiera: 28 maja 2025.' ]
-          },
-          {
-            title:'Odświeżenie UI/UX: nowe motywy',
-            p:[ 'Odnowiliśmy interfejs: dodaliśmy nowe schematy kolorów, ulepszyliśmy nawigację i zoptymalizowaliśmy sterowanie dla wygodniejszej pracy.' ]
-          }
+          { title:'Rocznica projektu PredictorPro', p:[ 'Nasz projekt PredictorPro kończy rok! W tym czasie setki uczestników osiągnęły znakomite wyniki, odmieniły życie i zaczęły dobrze zarabiać. Dziękujemy za wsparcie — jesteśmy jedną, wielką rodziną z nowymi celami. Z tej okazji PredictorPro będzie darmowy przez cały miesiąc. Powodzenia i wielkich wygranych!' ] },
+          { title:'Aktualizacja gry „Miny”', p:[ 'Dziś mocno usprawniliśmy system predykcji dla „Min”. Dzięki głębokiej analizie danych nasza skuteczność sięga 97%. Sprawdź sam!' ] },
+          { title:'Nowa funkcja: „Historia zakładów”', p:[ 'Wprowadziliśmy „Historię zakładów”: teraz przejrzysz i przeanalizujesz wszystkie swoje prognozy z każdej sesji w jednym miejscu.' ] },
+          { title:'Prace nad aplikacją mobilną PredictorPro', p:[ 'Aktywnie tworzymy aplikację mobilną PredictorPro. Planowana premiera: 28 maja 2025.' ] },
+          { title:'Odświeżenie UI/UX: nowe motywy', p:[ 'Odnowiliśmy interfejs: dodaliśmy nowe schematy kolorów, ulepszyliśmy nawigację i zoptymalizowaliśmy sterowanie dla wygodniejszej pracy.' ] }
         ]
       },
       fr: {
         langName:'Français', langTag:'fr', dir:'ltr',
         title:'PredictorPro – Page d’accueil',
         themeAria:'Changer de thème',
-        online:'En ligne',
-        support:'Chat du support',
+        support:'Support',
+        langCaption:'Langue',
+        usersOnline:'Utilisateurs en ligne',
+        back:'Retour',
         games:{ aviator:'Aviator', penalty:'Penalty', mines:'Mines', apple:'Pomme de la Fortune' },
         newsHeader:'Actualités du projet',
         rights:'Tous droits réservés.',
+        faqTitle:'FAQ',
+        faqIntro1:'Cette section est en maintenance.',
+        faqIntro2:'Veuillez réessayer plus tard.',
+        q1:'Comment fonctionnent les prévisions ?', a1:'Nous analysons les données pour choisir le bon moment.',
+        q2:'Quel est leur niveau de précision ?', a2:'Avec une bonne gestion, la stabilité augmente.',
         news:[
           {
             title:'Frères ! Victoire historique de Jorge Reyes !',
@@ -492,26 +1069,11 @@
               'Ce n’est pas de la chance : c’est du travail, de la foi et de bonnes décisions. Jorge a gagné. À vous de jouer.'
             ]
           },
-          {
-            title:'Anniversaire du projet PredictorPro',
-            p:[ 'Notre projet PredictorPro fête sa première année ! Durant cette période, des centaines de participants ont obtenu des résultats remarquables, changé leur vie et commencé à bien gagner. Merci à tous pour votre soutien — nous sommes désormais une grande famille tournée vers de nouveaux objectifs. Pour célébrer, PredictorPro sera gratuit pendant un mois. Bonne chance et belles victoires !' ]
-          },
-          {
-            title:'Mise à jour du jeu « Mines »',
-            p:[ 'Nous avons nettement amélioré le système de prédiction pour « Mines ». Grâce à une analyse approfondie des données, notre précision atteint 97 %. Essayez par vous-même !' ]
-          },
-          {
-            title:'Nouvelle fonctionnalité : « Historique des paris »',
-            p:[ 'Nous lançons « Historique des paris » : vous pouvez désormais consulter et analyser toutes vos prédictions de chaque session en un seul endroit.' ]
-          },
-          {
-            title:'Développement de l’app mobile PredictorPro',
-            p:[ 'Nous développons activement l’application mobile PredictorPro. Lancement prévu : 28 mai 2025.' ]
-          },
-          {
-            title:'Mise à jour UI/UX : nouveaux thèmes',
-            p:[ 'Nous avons modernisé l’interface : nouveaux jeux de couleurs, navigation améliorée et contrôles optimisés pour une expérience más confortable.' ]
-          }
+          { title:'Anniversaire du projet PredictorPro', p:[ 'Notre projet PredictorPro fête sa première année ! Durant cette période, des centaines de participants ont obtenu des résultats remarquables, changé leur vie et commencé à bien gagner. Merci à tous pour votre soutien — nous sommes désormais une grande famille tournée vers de nouveaux objectifs. Pour célébrer, PredictorPro sera gratuit pendant un mois. Bonne chance et belles victoires !' ] },
+          { title:'Mise à jour du jeu « Mines »', p:[ 'Nous avons nettement amélioré le système de prédiction pour « Mines ». Grâce à une analyse approfondie des données, notre précision atteint 97 %. Essayez par vous-même !' ] },
+          { title:'Nouvelle fonctionnalité : « Historique des paris »', p:[ 'Nous lançons « Historique des paris » : vous pouvez désormais consulter et analyser toutes vos prédictions de chaque session en un seul endroit.' ] },
+          { title:'Développement de l’app mobile PredictorPro', p:[ 'Nous développons activement l’application mobile PredictorPro. Lancement prévu : 28 mai 2025.' ] },
+          { title:'Mise à jour UI/UX : nouveaux thèmes', p:[ 'Nous avons modernisé l’interface : nouveaux jeux de couleurs, navigation améliorée et contrôles optimisés pour une expérience plus confortable.' ] }
         ]
       }
     };
@@ -519,12 +1081,10 @@
     // Узлы для подстановки
     const htmlEl = document.documentElement;
     const docTitle = document.getElementById('docTitle');
-    const onlineLabel = document.getElementById('onlineLabel');
-    const supportLabel = document.getElementById('supportChatLabel');
-    const supportLinkAria = document.getElementById('supportLinkAria');
+    const supportLabelTop = document.getElementById('supportLabelTop');
     const langBtn = document.getElementById('langBtn');
     const langBtnLabel = document.getElementById('langBtnLabel');
-    const langMenu = document.getElementById('langMenu');
+    const langCaptionEl = document.getElementById('langCaption');
     const rightsEl = document.getElementById('rightsLabel');
 
     const gameAviator = document.getElementById('gameAviator');
@@ -558,40 +1118,85 @@
     const news5Title = document.getElementById('news5Title');
     const news5p1 = document.getElementById('news5p1');
 
-    // Применение языка
-    function applyLang(code){
-      const dict = I18N[code] || I18N.ar;
+    // Элементы модалок/моб.меню
+    const langOverlay = document.getElementById('langOverlay');
+    const langOverlayBg = document.getElementById('langOverlayBg');
+    const langBackBtn = document.getElementById('langBackBtn');
+    const langBackText = document.getElementById('langBackText');
+    const langModalList = document.getElementById('langModalList');
 
-      // <html> lang/dir
+    const faqOverlay = document.getElementById('faqOverlay');
+    const faqOverlayBg = document.getElementById('faqOverlayBg');
+    const faqBackBtn = document.getElementById('faqBackBtn');
+    const faqBackText = document.getElementById('faqBackText');
+
+    const faqTitle = document.getElementById('faqTitle');
+    const faqIntro1 = document.getElementById('faqIntro1');
+    const faqIntro2 = document.getElementById('faqIntro2');
+    const faqQ1 = document.getElementById('faqQ1');
+    const faqA1 = document.getElementById('faqA1');
+    const faqQ2 = document.getElementById('faqQ2');
+    const faqA2 = document.getElementById('faqA2');
+
+    const onlineTooltipEl = document.getElementById('onlineTooltip');
+
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenuWrap = document.getElementById('mobileMenuWrap');
+    const mobileMenuBg = document.getElementById('mobileMenuBg');
+    const mobileLangBtn = document.getElementById('mobileLangBtn');
+    const mobileFaqBtn = document.getElementById('mobileFaqBtn');
+    const mobileSupportBtn = document.getElementById('mobileSupportBtn');
+    const mobileLangText = document.getElementById('mobileLangText');
+    const mobileSupportText = document.getElementById('mobileSupportText');
+
+    const faqBtnTopEl = document.getElementById('faqButtonTop');
+
+    let currentLang = 'es';
+
+    // Применение языка (адаптировано под AOF-структуру)
+    function applyLang(code){
+      currentLang = (I18N[code] ? code : 'ar');
+      const dict = I18N[currentLang];
+
       htmlEl.lang = dict.langTag;
       htmlEl.dir  = dict.dir;
 
-      // Заголовок документа
       if (docTitle) docTitle.textContent = dict.title;
 
-      // Текстовые метки шапки/чата/кнопок
-      if (onlineLabel) onlineLabel.textContent = dict.online;
-      if (supportLabel) supportLabel.textContent = dict.support;
-      if (supportLinkAria) supportLinkAria.setAttribute('aria-label', dict.support);
-      if (themeToggleEl) themeToggleEl.setAttribute('aria-label', dict.themeAria);
-
-      // Кнопка языка — подпись и aria
       if (langBtnLabel) langBtnLabel.textContent = dict.langName;
       if (langBtn) langBtn.setAttribute('aria-label', dict.langName);
 
-      // Игры
+      if (langCaptionEl) langCaptionEl.textContent = dict.langCaption || 'Language';
+
+      if (supportLabelTop) supportLabelTop.textContent = dict.support || 'Support';
+
+      if (onlineTooltipEl) onlineTooltipEl.textContent = dict.usersOnline || 'Users online';
+
+      if (langBackText) langBackText.textContent = dict.back || 'Back';
+      if (faqBackText)  faqBackText.textContent  = dict.back || 'Back';
+
+      if (mobileLangText) mobileLangText.textContent = dict.langCaption || 'Language';
+      if (mobileSupportText) mobileSupportText.textContent = dict.support || 'Support';
+
       if (gameAviator) gameAviator.textContent = dict.games.aviator;
       if (gamePenalty) gamePenalty.textContent = dict.games.penalty;
       if (gameMines)   gameMines.textContent   = dict.games.mines;
       if (gameApple)   gameApple.textContent   = dict.games.apple;
 
-      // Заголовок новостей
       if (newsHeader) newsHeader.textContent = dict.newsHeader;
 
-      // Фраза в копирайте
       if (rightsEl && dict.rights) rightsEl.textContent = dict.rights;
 
-      // Новости (тексты)
+      // FAQ тексты (центральная модалка)
+      if (faqTitle)  faqTitle.textContent  = dict.faqTitle || 'FAQ';
+      if (faqIntro1) faqIntro1.textContent = dict.faqIntro1 || '';
+      if (faqIntro2) faqIntro2.textContent = dict.faqIntro2 || '';
+      if (faqQ1)     faqQ1.textContent     = dict.q1 || '';
+      if (faqA1)     faqA1.textContent     = dict.a1 || '';
+      if (faqQ2)     faqQ2.textContent     = dict.q2 || '';
+      if (faqA2)     faqA2.textContent     = dict.a2 || '';
+
+      // Новости (как было)
       const n = dict.news;
       if (n && n[0]) {
         news0Title.textContent = n[0].title;
@@ -604,50 +1209,145 @@
       if (n && n[4]) { news4Title.textContent = n[4].title; if (news4p1) news4p1.textContent = n[4].p[0]; }
       if (n && n[5]) { news5Title.textContent = n[5].title; if (news5p1) news5p1.textContent = n[5].p[0]; }
 
-      // Сохранить выбор
-      try { localStorage.setItem('preferredLang', code); } catch(_) {}
+      try { localStorage.setItem('preferredLang', currentLang); } catch(_){}
     }
 
-    // Открыть/закрыть меню языков
-    (function langMenuInit(){
-      const btn = langBtn, menu = langMenu;
-      if (!btn || !menu) return;
+    /* ===== Язык: модалка по центру (как AOF) ===== */
+    function openLangMenu(){
+      if (!langOverlay) return;
+      langOverlay.classList.remove('hidden');
+      if (langBtn) langBtn.setAttribute('aria-expanded','true');
+    }
+    function closeLangMenu(){
+      if (!langOverlay) return;
+      langOverlay.classList.add('hidden');
+      if (langBtn) langBtn.setAttribute('aria-expanded','false');
+    }
 
-      btn.addEventListener('click', (e) => {
+    if (langBtn) {
+      langBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isOpen = !menu.classList.contains('hidden');
-        menu.classList.toggle('hidden', isOpen);
-        btn.setAttribute('aria-expanded', String(!isOpen));
+        const isOpen = !langOverlay.classList.contains('hidden');
+        if (isOpen) closeLangMenu(); else openLangMenu();
       });
-
-      document.addEventListener('click', () => {
-        if (!menu.classList.contains('hidden')) {
-          menu.classList.add('hidden');
-          btn.setAttribute('aria-expanded', 'false');
-        }
+    }
+    if (langBackBtn) {
+      langBackBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeLangMenu();
       });
-
-      // Выбор языка
-      menu.querySelectorAll('button[data-lang]').forEach(item => {
-        item.addEventListener('click', () => {
-          const code = item.getAttribute('data-lang') || 'ar';
+    }
+    if (langOverlayBg) {
+      langOverlayBg.addEventListener('click', () => closeLangMenu());
+    }
+    if (langModalList) {
+      langModalList.addEventListener('click', (e) => e.stopPropagation());
+      langModalList.querySelectorAll('button[data-lang]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const code = btn.getAttribute('data-lang') || 'ar';
           applyLang(code);
-          menu.classList.add('hidden');
-          btn.setAttribute('aria-expanded', 'false');
+          closeLangMenu();
         });
       });
+    }
 
-      // Инициализация: по умолчанию арабский, либо сохранённый
-      (function initLang(){
-        let code = 'ar';
-        try {
-          const saved = localStorage.getItem('preferredLang');
-          if (saved && I18N[saved]) code = saved;
-        } catch(_) {}
-        applyLang(code);
-      })();
+    /* ===== FAQ: модалка по центру (как AOF) ===== */
+    function openFaq(){
+      if (!faqOverlay) return;
+      faqOverlay.classList.remove('hidden');
+    }
+    function closeFaq(){
+      if (!faqOverlay) return;
+      faqOverlay.classList.add('hidden');
+    }
+    function toggleFaq(){
+      const isOpen = faqOverlay && !faqOverlay.classList.contains('hidden');
+      if (isOpen) closeFaq(); else openFaq();
+    }
+    if (faqBtnTopEl) faqBtnTopEl.addEventListener('click', (e) => { e.stopPropagation(); toggleFaq(); });
+    if (faqBackBtn) faqBackBtn.addEventListener('click', (e) => { e.stopPropagation(); closeFaq(); });
+    if (faqOverlayBg) faqOverlayBg.addEventListener('click', () => closeFaq());
+
+    if (document.getElementById('faqPanel')) {
+      document.getElementById('faqPanel').addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    /* ===== Мобильное бургер-меню (как AOF) ===== */
+    function openMobileMenu(){
+      if (!mobileMenuWrap || !mobileMenuToggle) return;
+      mobileMenuWrap.classList.add('open');
+      mobileMenuToggle.classList.add('open');
+      mobileMenuToggle.setAttribute('aria-expanded','true');
+    }
+    function closeMobileMenu(){
+      if (!mobileMenuWrap || !mobileMenuToggle) return;
+      mobileMenuWrap.classList.remove('open');
+      mobileMenuToggle.classList.remove('open');
+      mobileMenuToggle.setAttribute('aria-expanded','false');
+    }
+    function toggleMobileMenu(){
+      const isOpen = mobileMenuWrap && mobileMenuWrap.classList.contains('open');
+      if (isOpen) closeMobileMenu(); else openMobileMenu();
+    }
+
+    if (mobileMenuToggle) {
+      mobileMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
+      });
+    }
+    if (mobileMenuBg) mobileMenuBg.addEventListener('click', () => closeMobileMenu());
+
+    if (mobileLangBtn) {
+      mobileLangBtn.addEventListener('click', () => {
+        closeMobileMenu();
+        openLangMenu();
+      });
+    }
+    if (mobileFaqBtn) {
+      mobileFaqBtn.addEventListener('click', () => {
+        closeMobileMenu();
+        toggleFaq();
+      });
+    }
+    if (mobileSupportBtn) {
+      mobileSupportBtn.addEventListener('click', () => {
+        closeMobileMenu();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        closeLangMenu();
+        closeFaq();
+        closeMobileMenu();
+      }
+    });
+
+    /* ===== DO: сохраняем высоту шапки для mobile menu (как AOF) ===== */
+    (function syncHeaderHeight(){
+      const root = document.documentElement;
+      const headerEl = document.querySelector('header');
+      if (!headerEl) return;
+
+      function update(){
+        const hh = headerEl.getBoundingClientRect().height;
+        root.style.setProperty('--pp-header-h', hh + 'px');
+      }
+      window.addEventListener('resize', update);
+      requestAnimationFrame(update);
+      setTimeout(update, 0);
     })();
-    // =========================================================
+
+    // init language (как было, но через новую applyLang)
+    (function initLang(){
+      let code = 'es';
+      try {
+        const saved = localStorage.getItem('preferredLang');
+        if (saved && I18N[saved]) code = saved;
+      } catch(_){}
+      applyLang(code);
+    })();
   </script>
 </body>
 </html>
